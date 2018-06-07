@@ -9,3 +9,4 @@ F:\Work\com\ฝึกงาน\WindowsFormsApp1\WindowsFormsApp1\obj\Debug\Windo
 F:\Work\com\ฝึกงาน\WindowsFormsApp1\WindowsFormsApp1\obj\Debug\WindowsFormsApp1.exe
 F:\Work\com\ฝึกงาน\WindowsFormsApp1\WindowsFormsApp1\obj\Debug\WindowsFormsApp1.pdb
 F:\Work\com\ฝึกงาน\WindowsFormsApp1\WindowsFormsApp1\obj\Debug\WindowsFormsApp1.Form2.resources
+F:\Work\com\ฝึกงาน\WindowsFormsApp1\WindowsFormsApp1\obj\Debug\WindowsFormsApp1.UserControl1.resources
