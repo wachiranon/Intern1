@@ -23,13 +23,13 @@ namespace WindowsFormsApp1
 
         private void UserControl1_Load(object sender, EventArgs e)
         {
-
+            this.KeyDown += MyControl_SelectAll;
         }
+
 
         public void paint_point(int x, int y)
         {
-            UserControl1 area = new UserControl1();
-            //Panel area = new Panel();
+            Panel area = new Panel();
             area.Size = new Size(10, 10);
             area.Location = new Point(x, y);
             area.BackColor = Color.Blue;
@@ -43,6 +43,7 @@ namespace WindowsFormsApp1
 
             Control butt = (Control)sender;
             butt.BackColor = Color.Blue;
+
         }
 
         private void Button1_MouseDown(object sender, MouseEventArgs e)
@@ -108,6 +109,76 @@ namespace WindowsFormsApp1
                     fs.Flush();
                     fs.Close();
                     point_move(this.Controls);
+                }
+            }
+        }
+
+        public void MyControl_SelectAll(object sender, KeyEventArgs e)
+        {
+            
+            if (e.Control & e.KeyCode == Keys.A)
+            {
+                int num_point = this.Controls.Count;
+                //Panel m = new Panel();
+                foreach (Control p in this.Controls)
+                {
+                    Panel newPoint = new Panel();
+                    newPoint.BackColor = Color.Yellow;
+                    newPoint.Size = new Size(10, 10);
+                    newPoint.Location = p.Location;
+
+                    newPoint.MouseDown += SelectAll_MouseDown;
+                    newPoint.MouseUp += SelectAll_MouseUp;
+                    newPoint.MouseMove += SelectAll_MouseMove;
+
+
+                    this.Controls.Add(newPoint);
+                }
+                Remove_point(num_point);
+                
+            }
+        }
+
+        void Remove_point(int n_p)
+        {
+            for (int i = 0; i < n_p; i++)
+            {
+                this.Controls.RemoveAt(0);
+            }
+        }
+
+        private void SelectAll_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                x = e.X;
+                y = e.Y;
+            }
+        }
+
+        private void SelectAll_MouseUp(object sender, MouseEventArgs e)
+        {
+            int num_point = Controls.Count;
+
+            foreach (Control p in Controls)
+            {   
+                Panel newPoint = new Panel();
+                newPoint.BackColor = Color.Blue;
+                newPoint.Size = new Size(10, 10);
+                newPoint.Location = p.Location;
+                Controls.Add(newPoint);
+
+                point_move(newPoint);
+            }
+            Remove_point(num_point);
+        }
+        private void SelectAll_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                foreach (Control p in Controls)
+                {
+                    p.Location = new Point(e.X + p.Left - x, e.Y + p.Top - y);
                 }
             }
         }

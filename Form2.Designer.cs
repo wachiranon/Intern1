@@ -75,9 +75,9 @@
             // Area
             // 
             this.Area.BackColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.Area.Location = new System.Drawing.Point(159, 72);
+            this.Area.Location = new System.Drawing.Point(63, 72);
             this.Area.Name = "Area";
-            this.Area.Size = new System.Drawing.Size(458, 329);
+            this.Area.Size = new System.Drawing.Size(650, 366);
             this.Area.TabIndex = 5;
             this.Area.Load += new System.EventHandler(this.userControl11_Load);
             // 
