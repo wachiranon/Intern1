@@ -14,8 +14,9 @@ namespace WindowsFormsApp1
 {
     public partial class UserControl1 : UserControl
     {
-        int x, y;
+        int l_x, l_y;
         bool mouse_move = false;
+        List<Panel> selectedPoint = new List<Panel>();
         public UserControl1()
         {
             InitializeComponent();
@@ -24,8 +25,18 @@ namespace WindowsFormsApp1
         private void UserControl1_Load(object sender, EventArgs e)
         {
             this.KeyDown += MyControl_SelectAll;
+            
+            this.MouseDown += UserControl1_MouseDown;
         }
 
+        private void UserControl1_MouseDown(object sender, MouseEventArgs e)
+        {
+            foreach(Panel p in selectedPoint)
+            {
+                p.BackColor = Color.Blue;
+            }
+            selectedPoint.Clear();
+        }
 
         public void paint_point(int x, int y)
         {
@@ -33,48 +44,58 @@ namespace WindowsFormsApp1
             area.Size = new Size(10, 10);
             area.Location = new Point(x, y);
             area.BackColor = Color.Blue;
-
+            area.MouseDown += Button1_MouseDown;
+            area.MouseUp += Button1_MouseUp;
+            area.MouseMove += Button1_Move;
             this.Controls.Add(area);
         }
 
-        private void Button1_MouseUp(object sender, MouseEventArgs e)
+        public void Button1_MouseUp(object sender, MouseEventArgs e)
         {
             mouse_move = false;
-
-            Control butt = (Control)sender;
-            butt.BackColor = Color.Blue;
-
+            if (ModifierKeys != Keys.Control)
+            {
+                foreach (Panel p in selectedPoint)
+                {
+                    p.BackColor = Color.Blue;
+                }
+                selectedPoint.Clear();
+            }
+            
         }
 
-        private void Button1_MouseDown(object sender, MouseEventArgs e)
+        public void Button1_MouseDown(object sender, MouseEventArgs e)
         {
             mouse_move = true;
-            Control butt = (Control)sender;
-            x = e.X;
-            y = e.Y;
+            Panel butt = (Panel)sender;
+            l_x = e.X;
+            l_y = e.Y;
             butt.BackColor = Color.Yellow;
-        }
+            if (!selectedPoint.Contains(butt))
+            {
+                selectedPoint.Add(butt);
+            }
 
-        private void Button1_Move(object sender, MouseEventArgs e)
+            //this.MouseUp += Selected;
+        }
+        public void Button1_Move(object sender, MouseEventArgs e)
         {
             //this.Text = "Move";
             if(mouse_move == true)
             {
-                Control p = (Control)sender;
-                p.Location = new Point(e.X + p.Left - x, e.Y + p.Top - y);
+                int j = selectedPoint.Count;
+                int d_x = e.X - l_x;
+                int d_y = e.Y - l_y;
+                foreach (Control c in selectedPoint)
+                {
+                    Panel p = (Panel)c;
+                    p.Location = new Point(p.Left + d_x, p.Top + d_y);
+
+                }
             }
         }
 
-        public void point_move(object panel)
-        {
-            foreach (Control p in this.Controls)
-            {
-                p.MouseUp += Button1_MouseUp;
-                p.MouseDown += Button1_MouseDown;
-                p.MouseMove += Button1_Move;
 
-            }
-        }
 
         public void Save_point()
         {
@@ -92,7 +113,6 @@ namespace WindowsFormsApp1
                 }
             }
         }
-
         public void Load_point()
         {
             using (FileStream fs = new FileStream("point.bin", FileMode.Open))
@@ -108,77 +128,60 @@ namespace WindowsFormsApp1
                     }
                     fs.Flush();
                     fs.Close();
-                    point_move(this.Controls);
                 }
             }
         }
 
         public void MyControl_SelectAll(object sender, KeyEventArgs e)
         {
-            
             if (e.Control & e.KeyCode == Keys.A)
             {
-                int num_point = this.Controls.Count;
+                //int num_point = this.Controls.Count;
                 //Panel m = new Panel();
-                foreach (Control p in this.Controls)
+                foreach (Panel p in this.Controls)
                 {
-                    Panel newPoint = new Panel();
-                    newPoint.BackColor = Color.Yellow;
-                    newPoint.Size = new Size(10, 10);
-                    newPoint.Location = p.Location;
+                    //Panel newPoint = new Panel();
+                    //newPoint.BackColor = Color.Yellow;
+                    //newPoint.Size = new Size(10, 10);
+                    //newPoint.Location = p.Location;
+                    //newPoint.MouseDown += SelectAll_MouseDown;
+                    //newPoint.MouseUp += SelectAll_MouseUp;
+                    //newPoint.MouseMove += SelectAll_MouseMove;
 
-                    newPoint.MouseDown += SelectAll_MouseDown;
-                    newPoint.MouseUp += SelectAll_MouseUp;
-                    newPoint.MouseMove += SelectAll_MouseMove;
+                    //this.Controls.Add(newPoint);
+                    p.BackColor = Color.Yellow;
+                    selectedPoint.Add(p);
 
-
-                    this.Controls.Add(newPoint);
                 }
-                Remove_point(num_point);
-                
+               // Remove_point(num_point);
             }
         }
 
-        void Remove_point(int n_p)
+
+        List<PointHistory> h_p = new List<PointHistory>();
+        enum CommandKind
         {
-            for (int i = 0; i < n_p; i++)
+            Unknown,
+            Position,
+            BgColor
+        }
+        class PointHistory
+        {
+            public Panel targetPoint;
+            public int X;
+            public int Y;
+            public Color BgColor;
+            public CommandKind command;
+
+            public override string ToString()
             {
-                this.Controls.RemoveAt(0);
-            }
-        }
-
-        private void SelectAll_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                x = e.X;
-                y = e.Y;
-            }
-        }
-
-        private void SelectAll_MouseUp(object sender, MouseEventArgs e)
-        {
-            int num_point = Controls.Count;
-
-            foreach (Control p in Controls)
-            {   
-                Panel newPoint = new Panel();
-                newPoint.BackColor = Color.Blue;
-                newPoint.Size = new Size(10, 10);
-                newPoint.Location = p.Location;
-                Controls.Add(newPoint);
-
-                point_move(newPoint);
-            }
-            Remove_point(num_point);
-        }
-        private void SelectAll_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                foreach (Control p in Controls)
+                if(targetPoint.Tag != null)
                 {
-                    p.Location = new Point(e.X + p.Left - x, e.Y + p.Top - y);
+                    return command + (int)targetPoint.Tag + "," + X + "," + Y + "," + BgColor;
+                }
+                else
+                {
+                    return command + X + "," + Y + "," + BgColor;
                 }
             }
         }

@@ -33,6 +33,7 @@
             this.button2 = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
             this.Area = new WindowsFormsApp1.UserControl1();
+            this.panel1 = new System.Windows.Forms.Panel();
             this.SuspendLayout();
             // 
             // PointNum
@@ -77,15 +78,24 @@
             this.Area.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.Area.Location = new System.Drawing.Point(63, 72);
             this.Area.Name = "Area";
-            this.Area.Size = new System.Drawing.Size(650, 366);
+            this.Area.Size = new System.Drawing.Size(430, 366);
             this.Area.TabIndex = 5;
             this.Area.Load += new System.EventHandler(this.userControl11_Load);
+            // 
+            // panel1
+            // 
+            this.panel1.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.panel1.Location = new System.Drawing.Point(517, 72);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(252, 291);
+            this.panel1.TabIndex = 6;
             // 
             // Form2
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.panel1);
             this.Controls.Add(this.Area);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.button2);
@@ -105,5 +115,6 @@
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Button button3;
         private UserControl1 Area;
+        private System.Windows.Forms.Panel panel1;
     }
 }

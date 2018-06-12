@@ -53,7 +53,7 @@ namespace WindowsFormsApp1
 
         private void Form2_Load(object sender, EventArgs e)
         {
-
+            //Area.MouseDown += Area.Selected;
         }
 
         private void panel1_Paint(object sender, PaintEventArgs e)
@@ -69,8 +69,7 @@ namespace WindowsFormsApp1
             {
                Area.paint_point(i*10,i*10);
             }
-            Area.point_move(this.Area.Controls);
-
+            //Area.point_move();
 
         }
 
@@ -89,6 +88,7 @@ namespace WindowsFormsApp1
         {
             this.Area.Controls.Clear();
             Area.Load_point();
+            //Area.point_move();
       //      using (FileStream fs = new FileStream("point.bin", FileMode.Open))
       //      {
       //          using (BinaryReader r = new BinaryReader(fs))
@@ -130,7 +130,7 @@ namespace WindowsFormsApp1
 
         private void userControl11_Load(object sender, EventArgs e)
         {
-
+            //Area.point_move();
         }
 
         
