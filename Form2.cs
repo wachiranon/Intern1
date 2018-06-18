@@ -141,8 +141,8 @@ namespace WindowsFormsApp1
 
         private void button4_Click(object sender, EventArgs e)
         {
-            //Log.Text += "P\r\n"+Area.ShowLogs();
-            //Log.Text += "----\r\n";
+            Log.Text += "P\r\n"+Area.ShowLogs();
+            Log.Text += "----\r\n";
             Log.Text += "Undo\r\n"+Area.ShowLogs_undo();
             Log.Text += "----\r\n";
             Log.Text += "Redo\r\n"+Area.ShowLogs_redo();

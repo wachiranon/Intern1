@@ -74,12 +74,14 @@ namespace WindowsFormsApp1
                             p_h.X = p.Location.X;
                             p_h.Y = p.Location.Y;
                             selectedPoint.Add(p);
-                            Point_his.Add(p_h);
-                            //undo_point.Add(p_h);
+
+              //              Point_his.Add(p_h);
+                            undo_point.Add(p_h);
                         }
                     }
                 }
             }
+            multi_point.Add(selectedPoint.Count);
         }
 
         public void select_move(object sender, MouseEventArgs e){
@@ -90,17 +92,23 @@ namespace WindowsFormsApp1
 
         public void undo_key(object sender, KeyEventArgs e)
         {
-            if (e.Control & e.KeyCode == Keys.Z)
+            if (undo_point.Count != 0)
             {
-                undo();
+                if (e.Control & e.KeyCode == Keys.Z)
+                {
+                    undo(); 
+                }
             }
         }
 
         public void redo_key(object sender, KeyEventArgs e)
         {
-            if (e.Control & e.KeyCode == Keys.X)
+            if (redo_point.Count != 0)
             {
-                redo();
+                if (e.Control & e.KeyCode == Keys.X)
+                {
+                     redo(); 
+                }
             }
         }
 
@@ -111,6 +119,7 @@ namespace WindowsFormsApp1
                 p.BackColor = Color.Blue;
             }
             selectedPoint.Clear();
+            //multi_point.Clear();
         }
 
         public void paint_point(int num)
@@ -130,7 +139,7 @@ namespace WindowsFormsApp1
                 p_h.BgColor = area.BackColor;
                 p_h.X = area.Location.X;
                 p_h.Y = area.Location.Y;
-                Point_his.Add(p_h);
+             //   Point_his.Add(p_h);
 
                 this.Controls.Add(area);
 
@@ -145,19 +154,24 @@ namespace WindowsFormsApp1
             {
                 foreach (Panel p in selectedPoint)
                 {
-                    p.BackColor = Color.Blue;
+                    //p.BackColor = Color.Blue;
                     PointHistory p_h = new PointHistory();
                     p_h.targetPoint = p;
                     p_h.BgColor = p.BackColor;
                     //p_h.command = CommandKind.BgColor;
                     p_h.X = p.Location.X;
                     p_h.Y = p.Location.Y;
-
-                    redo_point.Add(p_h);
+                    Point_his.Add(p_h);
+                    //redo_point.Add(p_h);
                     //undo_point.Add(p_h);
                 }
-                
-                selectedPoint.Clear();
+
+                if (selectedPoint.Count == 1)
+                {
+                    multi_point.Add(selectedPoint.Count);
+                    selectedPoint[0].BackColor = Color.Blue;
+                    selectedPoint.Clear();
+                }
             }
             
         }
@@ -180,6 +194,7 @@ namespace WindowsFormsApp1
                 selectedPoint.Add(butt);
                 Point_his.Add(p_h);
                 undo_point.Add(p_h);
+
             }
 
             //this.MouseUp += Selected;
@@ -189,7 +204,6 @@ namespace WindowsFormsApp1
             //this.Text = "Move";
             if(mouse_move == true)
             {
-                int j = selectedPoint.Count;
                 int d_x = e.X - l_x;
                 int d_y = e.Y - l_y;
                 
@@ -198,13 +212,13 @@ namespace WindowsFormsApp1
                 {
                     p = (Panel)c;
                     p.Location = new Point(p.Left + d_x, p.Top + d_y);
-                    
                 }
-
+                redo_point.Clear();
             }
         }
 
-
+        List<int> multi_point = new List<int>();
+        List<int> multi_redo = new List<int>();
 
         public void Save_point()
         {
@@ -250,7 +264,7 @@ namespace WindowsFormsApp1
                         p_h.X = area.Location.X;
                         p_h.Y = area.Location.Y;
                         //undo_point.Add(p_h);
-                        Point_his.Add(p_h);
+                //        Point_his.Add(p_h);
                         this.Controls.Add(area);
                         i++;
                     }
@@ -284,54 +298,57 @@ namespace WindowsFormsApp1
                     //p_h.command = CommandKind.BgColor;
                     p_h.X = p.Location.X;
                     p_h.Y = p.Location.Y;
-                    Point_his.Add(p_h);
+                //    Point_his.Add(p_h);
                     undo_point.Add(p_h);
                     selectedPoint.Add(p);
-
                 }
+                multi_point.Add(selectedPoint.Count);
                // Remove_point(num_point);
             }
         }
         
         public void undo()
         {
-            int j = undo_point.Count;
-            int n = Point_his.Count;
-            for(int i = 0; i < n; i++)
+            if (multi_point.Count != 0 && undo_point.Count != 0)
             {
-                if(undo_point[j-1].targetPoint.Tag == Point_his[i].targetPoint.Tag)
+                for (int k = 0; k < multi_point[multi_point.Count - 1]; k++)
                 {
-                    Point_his[i].targetPoint.Location = new Point(undo_point[j - 1].X, undo_point[j - 1].Y);
+                    Control p = undo_point[undo_point.Count - 1].targetPoint;
+
+                    PointHistory p_h = new PointHistory();
+                    p_h.targetPoint = p;
+                    p_h.BgColor = p.BackColor;
+                    p_h.X = p.Location.X;
+                    p_h.Y = p.Location.Y;
+                    redo_point.Add(p_h);
+                    undo_point[undo_point.Count - 1].targetPoint.Location = new Point(undo_point[undo_point.Count - 1].X, undo_point[undo_point.Count - 1].Y);
+                    undo_point.RemoveAt(undo_point.Count - 1);
                 }
+                multi_redo.Add(multi_point[multi_point.Count - 1]);
+                multi_point.RemoveAt(multi_point.Count - 1);
             }
-
-            if (!redo_point.Contains(undo_point[j - 1]))
-            {
-                redo_point.Add(undo_point[j - 1]);
-
-            }
-            undo_point.RemoveAt(j - 1);
-
         }
         public void redo()
         {
-            int j = redo_point.Count;
-            int n = Point_his.Count;
-            for (int i = 0; i < n; i++)
+            if (multi_redo.Count != 0 && redo_point.Count != 0)
             {
-                if (redo_point[j - 1].targetPoint.Tag == Point_his[i].targetPoint.Tag)
+                for (int k = 0; k < multi_redo[multi_redo.Count - 1]; k++)
                 {
-                    Point_his[i].targetPoint.Location = new Point(redo_point[j - 1].X, redo_point[j - 1].Y);
+                        Control p = redo_point[redo_point.Count - 1].targetPoint;
+
+                        PointHistory p_h = new PointHistory();
+                        p_h.targetPoint = p;
+                        p_h.BgColor = p.BackColor;
+                        p_h.X = p.Location.X;
+                        p_h.Y = p.Location.Y;
+                        undo_point.Add(p_h);
+                        redo_point[redo_point.Count - 1].targetPoint.Location = new Point(redo_point[redo_point.Count - 1].X, redo_point[redo_point.Count - 1].Y);
+                        redo_point.RemoveAt(redo_point.Count - 1);
+                    
                 }
+                multi_point.Add(multi_redo[multi_redo.Count - 1]);
+                multi_redo.RemoveAt(multi_redo.Count - 1);
             }
-            
-            if (!undo_point.Contains(redo_point[j - 1]))
-            {
-                undo_point.Add(redo_point[j - 1]);
-            }
-
-            redo_point.RemoveAt(j - 1);
-
         }
 
         public void remove_point()
@@ -346,16 +363,9 @@ namespace WindowsFormsApp1
             }
         }
 
-
-        enum CommandKind
-        {
-            Unknown,
-            Position,
-            BgColor
-        }
         class PointHistory
         {
-            public Panel targetPoint;
+            public Control targetPoint;
             public int X;
             public int Y;
             public Color BgColor;
@@ -378,7 +388,7 @@ namespace WindowsFormsApp1
         List<PointHistory> undo_point = new List<PointHistory>();
         List<PointHistory> redo_point = new List<PointHistory>();
 
-        List<int> list1 = new List<int>();
+        //List<int> list1 = new List<int>();
 
         public string ShowLogs()
         {
