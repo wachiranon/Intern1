@@ -54,6 +54,7 @@ namespace WindowsFormsApp1
         private void Form2_Load(object sender, EventArgs e)
         {
             //Area.MouseDown += Area.Selected;
+            
         }
 
         private void panel1_Paint(object sender, PaintEventArgs e)
@@ -65,10 +66,9 @@ namespace WindowsFormsApp1
         private void button1_Click(object sender, EventArgs e)
         {
             int p_num = int.Parse(PointNum.Text);
-            for(int i = 0; i < p_num; i++)
-            {
-               Area.paint_point(i*10,i*10);
-            }
+            Area.paint_point(p_num);
+            
+            
             //Area.point_move();
 
         }
@@ -88,6 +88,7 @@ namespace WindowsFormsApp1
         {
             this.Area.Controls.Clear();
             Area.Load_point();
+            
             //Area.point_move();
       //      using (FileStream fs = new FileStream("point.bin", FileMode.Open))
       //      {
@@ -133,6 +134,39 @@ namespace WindowsFormsApp1
             //Area.point_move();
         }
 
-        
+        private void Log_Paint(object sender, PaintEventArgs e)
+        {
+            
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            //Log.Text += "P\r\n"+Area.ShowLogs();
+            //Log.Text += "----\r\n";
+            Log.Text += "Undo\r\n"+Area.ShowLogs_undo();
+            Log.Text += "----\r\n";
+            Log.Text += "Redo\r\n"+Area.ShowLogs_redo();
+            Log.Text += "----\r\n";
+        }
+
+        private void Index_Click(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void undo_Click(object sender, EventArgs e)
+        {
+            Area.undo();
+        }
+
+        private void redo_Click(object sender, EventArgs e)
+        {
+            Area.redo();
+        }
+
+        private void delete_Click(object sender, EventArgs e)
+        {
+            Area.remove_point();
+        }
     }
 }

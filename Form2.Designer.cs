@@ -32,8 +32,12 @@
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
+            this.Log = new System.Windows.Forms.TextBox();
+            this.button4 = new System.Windows.Forms.Button();
+            this.undo = new System.Windows.Forms.Button();
+            this.redo = new System.Windows.Forms.Button();
             this.Area = new WindowsFormsApp1.UserControl1();
-            this.panel1 = new System.Windows.Forms.Panel();
+            this.delete = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // PointNum
@@ -73,29 +77,73 @@
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
+            // Log
+            // 
+            this.Log.Location = new System.Drawing.Point(511, 130);
+            this.Log.Multiline = true;
+            this.Log.Name = "Log";
+            this.Log.Size = new System.Drawing.Size(264, 308);
+            this.Log.TabIndex = 6;
+            // 
+            // button4
+            // 
+            this.button4.Location = new System.Drawing.Point(567, 27);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(75, 23);
+            this.button4.TabIndex = 7;
+            this.button4.Text = "Log";
+            this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.button4_Click);
+            // 
+            // undo
+            // 
+            this.undo.Location = new System.Drawing.Point(511, 72);
+            this.undo.Name = "undo";
+            this.undo.Size = new System.Drawing.Size(75, 23);
+            this.undo.TabIndex = 8;
+            this.undo.Text = "undo";
+            this.undo.UseVisualStyleBackColor = true;
+            this.undo.Click += new System.EventHandler(this.undo_Click);
+            // 
+            // redo
+            // 
+            this.redo.Location = new System.Drawing.Point(511, 101);
+            this.redo.Name = "redo";
+            this.redo.Size = new System.Drawing.Size(75, 23);
+            this.redo.TabIndex = 9;
+            this.redo.Text = "redo";
+            this.redo.UseVisualStyleBackColor = true;
+            this.redo.Click += new System.EventHandler(this.redo_Click);
+            // 
             // Area
             // 
             this.Area.BackColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.Area.Location = new System.Drawing.Point(63, 72);
+            this.Area.Location = new System.Drawing.Point(23, 72);
             this.Area.Name = "Area";
-            this.Area.Size = new System.Drawing.Size(430, 366);
+            this.Area.Size = new System.Drawing.Size(470, 366);
             this.Area.TabIndex = 5;
             this.Area.Load += new System.EventHandler(this.userControl11_Load);
             // 
-            // panel1
+            // delete
             // 
-            this.panel1.BackColor = System.Drawing.SystemColors.ActiveCaption;
-            this.panel1.Location = new System.Drawing.Point(517, 72);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(252, 291);
-            this.panel1.TabIndex = 6;
+            this.delete.Location = new System.Drawing.Point(648, 26);
+            this.delete.Name = "delete";
+            this.delete.Size = new System.Drawing.Size(75, 23);
+            this.delete.TabIndex = 10;
+            this.delete.Text = "delete";
+            this.delete.UseVisualStyleBackColor = true;
+            this.delete.Click += new System.EventHandler(this.delete_Click);
             // 
             // Form2
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.panel1);
+            this.ClientSize = new System.Drawing.Size(813, 450);
+            this.Controls.Add(this.delete);
+            this.Controls.Add(this.redo);
+            this.Controls.Add(this.undo);
+            this.Controls.Add(this.button4);
+            this.Controls.Add(this.Log);
             this.Controls.Add(this.Area);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.button2);
@@ -115,6 +163,10 @@
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Button button3;
         private UserControl1 Area;
-        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.TextBox Log;
+        private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.Button undo;
+        private System.Windows.Forms.Button redo;
+        private System.Windows.Forms.Button delete;
     }
 }
