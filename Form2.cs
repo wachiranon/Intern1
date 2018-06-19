@@ -7,8 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-
 using System.IO;
+using Newtonsoft.Json.Serialization;
 
 namespace WindowsFormsApp1
 {
@@ -65,8 +65,12 @@ namespace WindowsFormsApp1
 
         private void button1_Click(object sender, EventArgs e)
         {
-            int p_num = int.Parse(PointNum.Text);
-            Area.paint_point(p_num);
+            if (PointNum.Text != null)
+            {
+                int p_num = int.Parse(PointNum.Text);
+
+                Area.paint_point(p_num);
+            }
             
             
             //Area.point_move();
@@ -141,12 +145,13 @@ namespace WindowsFormsApp1
 
         private void button4_Click(object sender, EventArgs e)
         {
-            Log.Text += "P\r\n"+Area.ShowLogs();
+            //Log.Text += "P\r\n"+Area.ShowLogs();
+            //Log.Text += "----\r\n";
+            Log.Text += "Undo\r\n" + Area.ShowLogs_undo();
             Log.Text += "----\r\n";
-            Log.Text += "Undo\r\n"+Area.ShowLogs_undo();
+            Log.Text += "Redo\r\n" + Area.ShowLogs_redo();
             Log.Text += "----\r\n";
-            Log.Text += "Redo\r\n"+Area.ShowLogs_redo();
-            Log.Text += "----\r\n";
+            
         }
 
         private void Index_Click(object sender, EventArgs e)
@@ -166,7 +171,7 @@ namespace WindowsFormsApp1
 
         private void delete_Click(object sender, EventArgs e)
         {
-            Area.remove_point();
+            //Area.remove_point();
         }
     }
 }
