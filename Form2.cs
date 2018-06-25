@@ -161,7 +161,14 @@ namespace WindowsFormsApp1
 
         private void undo_Click(object sender, EventArgs e)
         {
-            Area.undo();
+            if (this.checkBox1.Checked == true)
+            {
+                Area.undo_anime();
+            }
+            else
+            {
+                Area.undo();
+            }
         }
 
         private void redo_Click(object sender, EventArgs e)
@@ -172,6 +179,11 @@ namespace WindowsFormsApp1
         private void delete_Click(object sender, EventArgs e)
         {
             //Area.remove_point();
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

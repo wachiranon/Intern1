@@ -37,6 +37,44 @@ namespace WindowsFormsApp1
 
             this.KeyDown += undo_key;
             this.KeyDown += redo_key;
+
+            timer1.Tick += (s2,e2) =>
+            {
+                this.Invoke(new MethodInvoker(()=> {
+
+                    if (undo_point[undo_point.Count - 1].targetPoint.Location.X < undo_point[undo_point.Count - 1].X)
+                    {
+                        undo_point[undo_point.Count - 1].targetPoint.Left += 1;//Location = new Point(undo_point[undo_point.Count - 1].targetPoint.Location.X + 10, undo_point[undo_point.Count - 1].targetPoint.Location.Y);
+                    }
+                    else if (undo_point[undo_point.Count - 1].targetPoint.Location.X > undo_point[undo_point.Count - 1].X)
+                    {
+                        undo_point[undo_point.Count - 1].targetPoint.Left -= 1;//Location = new Point(undo_point[undo_point.Count - 1].targetPoint.Location.X - 10, undo_point[undo_point.Count - 1].targetPoint.Location.Y);
+                    }
+                    //else if (undo_point[undo_point.Count - 1].targetPoint.Location.X == undo_point[undo_point.Count - 1].X)
+                    //{
+                    //    undo_point[undo_point.Count - 1].targetPoint.Location = new Point(undo_point[undo_point.Count - 1].targetPoint.Location.X, undo_point[undo_point.Count - 1].targetPoint.Location.Y);
+                    //}
+                    else if (undo_point[undo_point.Count - 1].targetPoint.Location.Y < undo_point[undo_point.Count - 1].Y)
+                    {
+                        undo_point[undo_point.Count - 1].targetPoint.Top += 1;//Location = new Point(undo_point[undo_point.Count - 1].targetPoint.Location.X, undo_point[undo_point.Count - 1].targetPoint.Location.Y + 10);
+                    }
+                    else if (undo_point[undo_point.Count - 1].targetPoint.Location.Y > undo_point[undo_point.Count - 1].Y)
+                    {
+                        undo_point[undo_point.Count - 1].targetPoint.Top -= 1;//Location = new Point(undo_point[undo_point.Count - 1].targetPoint.Location.X, undo_point[undo_point.Count - 1].targetPoint.Location.Y - 10);
+                    }
+                    //else //if (undo_point[undo_point.Count - 1].targetPoint.Location.Y == undo_point[undo_point.Count - 1].Y)
+                    //{
+                    //    undo_point[undo_point.Count - 1].targetPoint.Location = new Point(undo_point[undo_point.Count - 1].targetPoint.Location.X, undo_point[undo_point.Count - 1].targetPoint.Location.Y);
+                    //}
+
+                    if ((undo_point[undo_point.Count - 1].targetPoint.Location.X == undo_point[undo_point.Count - 1].X)&& (undo_point[undo_point.Count - 1].targetPoint.Location.Y == undo_point[undo_point.Count - 1].Y))
+                    {
+                        
+                        TimeCheck = 2;
+                        this.timer1.Stop();
+                    }
+                }));
+            };
         }
 
         public void select_down(object sender, MouseEventArgs e)
@@ -140,10 +178,10 @@ namespace WindowsFormsApp1
                 p_h.X = area.Location.X;
                 p_h.Y = area.Location.Y;
                 //   Point_his.Add(p_h);
-                if (!undo_point.Contains(p_h))
-                {
-                    undo_point.Add(p_h);
-                }
+                //if (!undo_point.Contains(p_h))
+                //{
+                //    undo_point.Add(p_h);
+                //}
 
                 this.Controls.Add(area);
 
@@ -237,7 +275,7 @@ namespace WindowsFormsApp1
 
         public void Save_point()
         {
-            List<p_j> p_d = new List<p_j>();
+            List<point_json> p_d = new List<point_json>();
             ////int i = 0;
             //using (FileStream fs = new FileStream("point.bin", FileMode.Create))
             //{
@@ -245,20 +283,21 @@ namespace WindowsFormsApp1
             //    {
             foreach (Control p in this.Controls)
             {
-                        p_j js = new p_j();
-            //            w.Write(p.Left);
-            //            w.Write(p.Top);
-                        js.loc_x = p.Left;
-                        js.loc_y = p.Top;
-                        p_d.Add(js);
-                       
+                point_json js = new point_json();
+                //            w.Write(p.Left);
+                //            w.Write(p.Top);
+                js.T = (int)p.Tag;
+                js.X = p.Left;
+                js.Y = p.Top;
+                p_d.Add(js);
+
             }
             //        fs.Flush();
             //        fs.Close();
             //    }
             //}
             JsonSerializer serializer = new JsonSerializer();
-            using (StreamWriter sw = new StreamWriter("json.json"))
+            using (StreamWriter sw = new StreamWriter("SavePanel.json"))
             using (JsonWriter writer = new JsonTextWriter(sw))
             {
                 string json = JsonConvert.SerializeObject(p_d);
@@ -266,17 +305,17 @@ namespace WindowsFormsApp1
             }
             if (undo_point.Count > 0)
             {
-                List<u_j> undo_js = new List<u_j>();
+                List<point_json> undo_js = new List<point_json>();
                 for(int i = 0; i <= undo_point.Count-1; i++)
                 {
-                    u_j new_u = new u_j();
-                    //new_u.tag = (int)undo_point[i].targetPoint.Tag;
-                    new_u.loc_x = undo_point[i].targetPoint.Location.X;
-                    new_u.loc_y = undo_point[i].targetPoint.Location.Y;
+                    point_json new_u = new point_json();
+                    new_u.T = (int)undo_point[i].targetPoint.Tag;
+                    new_u.X = undo_point[i].X;
+                    new_u.Y = undo_point[i].Y;
                     undo_js.Add(new_u);
                 }
                 JsonSerializer serial2 = new JsonSerializer();
-                using (StreamWriter sw2 = new StreamWriter("undo_json.json"))
+                using (StreamWriter sw2 = new StreamWriter("History.json"))
                 using (JsonWriter writer2 = new JsonTextWriter(sw2))
                 {
                     serial2.Serialize(writer2,undo_js );
@@ -286,7 +325,7 @@ namespace WindowsFormsApp1
             if (multi_point.Count > 0)
             {
                 JsonSerializer serial3 = new JsonSerializer();
-                using (StreamWriter sw3 = new StreamWriter("num_undo_json.json"))
+                using (StreamWriter sw3 = new StreamWriter("ListCountHistory.json"))
                 using (JsonWriter writer3 = new JsonTextWriter(sw3))
                 {
                     serial3.Serialize(writer3, multi_point);
@@ -294,17 +333,12 @@ namespace WindowsFormsApp1
             }
         }
         
-        class p_j
+        class point_json
         {
-            public int loc_x;
-            public int loc_y;
+            public int X;
+            public int Y;
+            public int T;
         } 
-        class u_j
-        {
-            //public int tag;
-            public int loc_x;
-            public int loc_y;
-        }
         public void Load_point()
         {
             this.Controls.Clear();
@@ -347,15 +381,15 @@ namespace WindowsFormsApp1
             //    }
             //}
             ///// paint point///////
-            List<p_j> p = new List<p_j>();
-            using (FileStream f_p = new FileStream("json.json", FileMode.Open))
+            List<point_json> p = new List<point_json>();
+            using (FileStream f_p = new FileStream("SavePanel.json", FileMode.Open))
             {
                 using (StreamReader s_p = new StreamReader(f_p))
                 {
                     //using (JsonReader r_p = new JsonTextReader(s_p))
                     //{
                     string r_j = s_p.ReadToEnd();
-                    p = JsonConvert.DeserializeObject<List<p_j>>(r_j);
+                    p = JsonConvert.DeserializeObject<List<point_json>>(r_j);
                     ////
                     //}
                     //f_p.Flush();
@@ -367,65 +401,73 @@ namespace WindowsFormsApp1
             {
                 Panel area = new Panel();
                 area.Size = new Size(10, 10);
-                area.Location = new Point(p[i].loc_x, p[i].loc_y);
+                area.Location = new Point(p[i].X, p[i].Y);
                 area.BackColor = Color.Blue;
                 area.MouseDown += Button1_MouseDown;
                 area.MouseUp += Button1_MouseUp;
                 area.MouseMove += Button1_Move;
-                area.Tag = i;
+                area.Tag = p[i].T;
                 PointHistory p_h = new PointHistory();
                 p_h.targetPoint = area;
-                p_h.X = area.Location.X;
-                p_h.Y = area.Location.Y;
+                p_h.X = p[i].X;
+                p_h.Y = p[i].Y;
 
                 this.Controls.Add(area);
             }
             ///// paint point///////
 
             ///// Add Undo /////
-            List<u_j> u = new List<u_j>();
-            using (FileStream f_p = new FileStream("undo_json.json", FileMode.Open))
+            List<point_json> u = new List<point_json>();
+            using (FileStream f_p = new FileStream("History.json", FileMode.Open))
             {
                 using (StreamReader s_p = new StreamReader(f_p))
                 {
                     string r_j = s_p.ReadToEnd();
 
-                    u = JsonConvert.DeserializeObject<List<u_j>>(r_j);
+                    u = JsonConvert.DeserializeObject<List<point_json>>(r_j);
                     f_p.Close();
                 }
-
             }
-            for (int i = 0; i < p.Count; i++)
+            //int a = 0;
+            while(u.Count>0)
             {
-                PointHistory p_h = new PointHistory();
-                Control u1 = new Control();
-                //u1.Tag = u[i].tag;
-                u1.Location = new Point(u[i].loc_x, u[i].loc_y);
-                p_h.targetPoint = u1;
-                p_h.X = u[i].loc_x;
-                p_h.Y = u[i].loc_y;
-
-                undo_point.Add(p_h);
+                //Panel u1 = new Panel();
+                foreach (Panel u1 in this.Controls)
+                {
+                    if ((int)u1.Tag == u[0].T)
+                    {
+                        PointHistory u_h = new PointHistory();
+                        //u1.BackColor = Color.Blue;
+                        u_h.targetPoint = u1;
+                        u_h.X = u[0].X;
+                        u_h.Y = u[0].Y;
+                        undo_point.Add(u_h);
+                        u.RemoveAt(0);
+                        break;
+                    }
+                }
+                //a++;
             }
             ///// Add Undo /////
 
             ///// Add multi undo /////
             List<int> m_p = new List<int>();
-            using (FileStream f_p = new FileStream("num_undo_json.json", FileMode.Open))
+            multi_point.Clear();
+            using (FileStream f_p = new FileStream("ListCountHistory.json", FileMode.Open))
             {
                 using (StreamReader s_p = new StreamReader(f_p))
                 {
                     string r_j = s_p.ReadToEnd();
 
-                    m_p = JsonConvert.DeserializeObject<List<int>>(r_j);
+                    multi_point = JsonConvert.DeserializeObject<List<int>>(r_j);
                     f_p.Close();
                 }
             }
 
-            for(int i =0; i < m_p.Count; i++)
-            {
-                multi_point.Add(m_p[i]);
-            }
+            //for(int b =0; b < m_p.Count; b++)
+            //{
+            //    multi_point.Add(m_p[b]);
+            //}
 
         }
 
@@ -455,6 +497,41 @@ namespace WindowsFormsApp1
                 multi_point.Add(selectedPoint.Count);
                // Remove_point(num_point);
             }
+        }
+
+        public int TimeCheck = 0;
+        // 0 = stop animetion
+        // 1 = start animetion
+        // 2 = remove list
+
+        public void undo_anime()
+        {
+            if (multi_point.Count != 0 && undo_point.Count != 0)
+            {
+                for (int k = 0; k < multi_point[multi_point.Count - 1]; k++)
+                {
+                    Control p = undo_point[undo_point.Count - 1].targetPoint;
+
+                    PointHistory p_h = new PointHistory();
+                    p_h.targetPoint = p;
+                    //                    p_h.BgColor = p.BackColor;
+                    p_h.X = p.Left;
+                    p_h.Y = p.Top;
+                    if (!redo_point.Contains(p_h))
+                    {
+                        redo_point.Add(p_h);
+                    }
+                    this.timer1.Enabled = !this.timer1.Enabled;
+                    TimeCheck = 1;
+                    if(TimeCheck == 2)
+                    {
+                        undo_point.RemoveAt(undo_point.Count - 1);
+                    }
+                }
+                multi_redo.Add(multi_point[multi_point.Count - 1]);
+                multi_point.RemoveAt(multi_point.Count - 1);
+            }
+                    
         }
         
         public void undo()
@@ -508,9 +585,6 @@ namespace WindowsFormsApp1
                 multi_redo.RemoveAt(multi_redo.Count - 1);
             }
         }
-
-
-
         class PointHistory
         {
             public Control targetPoint;
