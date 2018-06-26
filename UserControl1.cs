@@ -18,12 +18,13 @@ namespace WindowsFormsApp1
         int l_x, l_y;
         bool mouse_move = false;
         public int select_start_x, select_start_y, select_end_x, select_end_y;
-        List<Panel> selectedPoint = new List<Panel>();
+        List<Control> selectedPoint = new List<Control>();
+        List<PointHistory> selectedPoint_anime = new List<PointHistory>();
         public UserControl1()
         {
             InitializeComponent();
         }
-
+        
         private void UserControl1_Load(object sender, EventArgs e)
         {
             this.KeyDown += MyControl_SelectAll;
@@ -38,42 +39,79 @@ namespace WindowsFormsApp1
             this.KeyDown += undo_key;
             this.KeyDown += redo_key;
 
+            
             timer1.Tick += (s2,e2) =>
             {
-                this.Invoke(new MethodInvoker(()=> {
+                this.Invoke(new MethodInvoker(()=>
+                {
+                    if (multi_point.Count != 0 && undo_point.Count != 0)
+                    {
+                        /////
+                        if (TimeCheck == 1)
+                        {
+                            for (int i = 0; i < multi_point[multi_point.Count - 1]; i++)
+                            {
+                                Control p = undo_point[undo_point.Count - 1-i].targetPoint;
 
-                    if (undo_point[undo_point.Count - 1].targetPoint.Location.X < undo_point[undo_point.Count - 1].X)
-                    {
-                        undo_point[undo_point.Count - 1].targetPoint.Left += 1;//Location = new Point(undo_point[undo_point.Count - 1].targetPoint.Location.X + 10, undo_point[undo_point.Count - 1].targetPoint.Location.Y);
-                    }
-                    else if (undo_point[undo_point.Count - 1].targetPoint.Location.X > undo_point[undo_point.Count - 1].X)
-                    {
-                        undo_point[undo_point.Count - 1].targetPoint.Left -= 1;//Location = new Point(undo_point[undo_point.Count - 1].targetPoint.Location.X - 10, undo_point[undo_point.Count - 1].targetPoint.Location.Y);
-                    }
-                    //else if (undo_point[undo_point.Count - 1].targetPoint.Location.X == undo_point[undo_point.Count - 1].X)
-                    //{
-                    //    undo_point[undo_point.Count - 1].targetPoint.Location = new Point(undo_point[undo_point.Count - 1].targetPoint.Location.X, undo_point[undo_point.Count - 1].targetPoint.Location.Y);
-                    //}
-                    else if (undo_point[undo_point.Count - 1].targetPoint.Location.Y < undo_point[undo_point.Count - 1].Y)
-                    {
-                        undo_point[undo_point.Count - 1].targetPoint.Top += 1;//Location = new Point(undo_point[undo_point.Count - 1].targetPoint.Location.X, undo_point[undo_point.Count - 1].targetPoint.Location.Y + 10);
-                    }
-                    else if (undo_point[undo_point.Count - 1].targetPoint.Location.Y > undo_point[undo_point.Count - 1].Y)
-                    {
-                        undo_point[undo_point.Count - 1].targetPoint.Top -= 1;//Location = new Point(undo_point[undo_point.Count - 1].targetPoint.Location.X, undo_point[undo_point.Count - 1].targetPoint.Location.Y - 10);
-                    }
-                    //else //if (undo_point[undo_point.Count - 1].targetPoint.Location.Y == undo_point[undo_point.Count - 1].Y)
-                    //{
-                    //    undo_point[undo_point.Count - 1].targetPoint.Location = new Point(undo_point[undo_point.Count - 1].targetPoint.Location.X, undo_point[undo_point.Count - 1].targetPoint.Location.Y);
-                    //}
+                                PointHistory p_h = new PointHistory();
+                                p_h.targetPoint = p;
+                                p_h.X = p.Left;
+                                p_h.Y = p.Top;
+                                if (!redo_point.Contains(p_h))
+                                {
+                                    redo_point.Add(p_h);
+                                }
+                            }
 
-                    if ((undo_point[undo_point.Count - 1].targetPoint.Location.X == undo_point[undo_point.Count - 1].X)&& (undo_point[undo_point.Count - 1].targetPoint.Location.Y == undo_point[undo_point.Count - 1].Y))
-                    {
-                        
-                        TimeCheck = 2;
-                        this.timer1.Stop();
+                            TimeCheck = 2;
+                        }
+                        if (TimeCheck == 2)
+                        {
+                            int count_multi = 0;
+                            int last = undo_point.Count-1;
+                            while (count_multi < multi_point[multi_point.Count - 1])
+                            {
+                                if (undo_point[last-count_multi].targetPoint.Location.X < undo_point[last - count_multi].X)
+                                {
+                                    undo_point[last - count_multi].targetPoint.Left += 1;//Location = new Point(undo_point[undo_point.Count - 1].targetPoint.Location.X + 10, undo_point[undo_point.Count - 1].targetPoint.Location.Y);
+                                }
+                                else if (undo_point[last - count_multi].targetPoint.Location.X > undo_point[last - count_multi].X)
+                                {
+                                    undo_point[last - count_multi].targetPoint.Left -= 1;//Location = new Point(undo_point[undo_point.Count - 1].targetPoint.Location.X - 10, undo_point[undo_point.Count - 1].targetPoint.Location.Y);
+                                }
+                                if (undo_point[last - count_multi].targetPoint.Location.Y < undo_point[last - count_multi].Y)
+                                {
+                                    undo_point[last - count_multi].targetPoint.Top += 1;//Location = new Point(undo_point[undo_point.Count - 1].targetPoint.Location.X, undo_point[undo_point.Count - 1].targetPoint.Location.Y + 10);
+                                }
+                                else if (undo_point[last - count_multi].targetPoint.Location.Y > undo_point[last - count_multi].Y)
+                                {
+                                    undo_point[last - count_multi].targetPoint.Top -= 1;//Location = new Point(undo_point[undo_point.Count - 1].targetPoint.Location.X, undo_point[undo_point.Count - 1].targetPoint.Location.Y - 10);
+                                }
+                                count_multi++;
+                            }
+                            if ((undo_point[last].targetPoint.Location.X == undo_point[last].X) && (undo_point[last].targetPoint.Location.Y == undo_point[last].Y))
+                            {
+                                TimeCheck = 3;
+                            }
+                        }
+                        if (TimeCheck == 3)
+                        {
+                            for (int i = 0; i < multi_point[multi_point.Count - 1];i++)
+                            {
+                                undo_point.RemoveAt(undo_point.Count - 1);
+                            }
+
+                            multi_redo.Add(multi_point[multi_point.Count - 1]);
+                            multi_point.RemoveAt(multi_point.Count - 1);
+
+                            TimeCheck = 0;
+                            this.timer1.Stop();
+                        }
+                        /////
                     }
-                }));
+                    else { this.timer1.Stop(); }
+                }
+                ));
             };
         }
 
@@ -156,8 +194,7 @@ namespace WindowsFormsApp1
                 p.BackColor = Color.Blue;
             }
             //multi_point.Add(selectedPoint.Count);
-            selectedPoint.Clear();
-            
+            selectedPoint.Clear();   
         }
 
         public void paint_point(int num)
@@ -500,38 +537,19 @@ namespace WindowsFormsApp1
         }
 
         public int TimeCheck = 0;
-        // 0 = stop animetion
-        // 1 = start animetion
-        // 2 = remove list
+        // 0 = null
+        // 1 = add redo list
+        // 2 = move point
+        // 3 = remove undo list
 
-        public void undo_anime()
+        public void undo_anime(int choice)
         {
-            if (multi_point.Count != 0 && undo_point.Count != 0)
+            if (choice == 2)
             {
-                for (int k = 0; k < multi_point[multi_point.Count - 1]; k++)
-                {
-                    Control p = undo_point[undo_point.Count - 1].targetPoint;
-
-                    PointHistory p_h = new PointHistory();
-                    p_h.targetPoint = p;
-                    //                    p_h.BgColor = p.BackColor;
-                    p_h.X = p.Left;
-                    p_h.Y = p.Top;
-                    if (!redo_point.Contains(p_h))
-                    {
-                        redo_point.Add(p_h);
-                    }
-                    this.timer1.Enabled = !this.timer1.Enabled;
-                    TimeCheck = 1;
-                    if(TimeCheck == 2)
-                    {
-                        undo_point.RemoveAt(undo_point.Count - 1);
-                    }
-                }
-                multi_redo.Add(multi_point[multi_point.Count - 1]);
-                multi_point.RemoveAt(multi_point.Count - 1);
+                timer1.Interval = choice;
             }
-                    
+            this.timer1.Start();
+            TimeCheck = 1;
         }
         
         public void undo()
@@ -544,7 +562,6 @@ namespace WindowsFormsApp1
 
                     PointHistory p_h = new PointHistory();
                     p_h.targetPoint = p;
-//                    p_h.BgColor = p.BackColor;
                     p_h.X = p.Left;
                     p_h.Y = p.Top;
                     if (!redo_point.Contains(p_h))

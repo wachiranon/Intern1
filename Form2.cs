@@ -161,9 +161,15 @@ namespace WindowsFormsApp1
 
         private void undo_Click(object sender, EventArgs e)
         {
-            if (this.checkBox1.Checked == true)
+            if (this.checkBox1.Checked == true || this.checkBox2.Checked == true)
             {
-                Area.undo_anime();
+                if (this.checkBox1.Checked == true)
+                {
+                    Area.undo_anime(1);
+                }if (this.checkBox2.Checked == true)
+                {
+                    Area.undo_anime(2);
+                }
             }
             else
             {

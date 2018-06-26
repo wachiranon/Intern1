@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             this.PointNum = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
@@ -37,10 +36,10 @@
             this.button4 = new System.Windows.Forms.Button();
             this.undo = new System.Windows.Forms.Button();
             this.redo = new System.Windows.Forms.Button();
-            this.Area = new WindowsFormsApp1.UserControl1();
             this.delete = new System.Windows.Forms.Button();
-            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.Area = new WindowsFormsApp1.UserControl1();
+            this.checkBox2 = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // PointNum
@@ -118,15 +117,6 @@
             this.redo.UseVisualStyleBackColor = true;
             this.redo.Click += new System.EventHandler(this.redo_Click);
             // 
-            // Area
-            // 
-            this.Area.BackColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.Area.Location = new System.Drawing.Point(23, 72);
-            this.Area.Name = "Area";
-            this.Area.Size = new System.Drawing.Size(470, 366);
-            this.Area.TabIndex = 5;
-            this.Area.Load += new System.EventHandler(this.userControl11_Load);
-            // 
             // delete
             // 
             this.delete.Location = new System.Drawing.Point(648, 26);
@@ -142,17 +132,37 @@
             this.checkBox1.AutoSize = true;
             this.checkBox1.Location = new System.Drawing.Point(593, 72);
             this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(72, 17);
+            this.checkBox1.Size = new System.Drawing.Size(57, 17);
             this.checkBox1.TabIndex = 11;
-            this.checkBox1.Text = "Animation";
+            this.checkBox1.Text = "Speed";
             this.checkBox1.UseVisualStyleBackColor = true;
             this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            // 
+            // Area
+            // 
+            this.Area.BackColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.Area.Location = new System.Drawing.Point(23, 72);
+            this.Area.Name = "Area";
+            this.Area.Size = new System.Drawing.Size(470, 366);
+            this.Area.TabIndex = 5;
+            this.Area.Load += new System.EventHandler(this.userControl11_Load);
+            // 
+            // checkBox2
+            // 
+            this.checkBox2.AutoSize = true;
+            this.checkBox2.Location = new System.Drawing.Point(593, 96);
+            this.checkBox2.Name = "checkBox2";
+            this.checkBox2.Size = new System.Drawing.Size(49, 17);
+            this.checkBox2.TabIndex = 12;
+            this.checkBox2.Text = "Time";
+            this.checkBox2.UseVisualStyleBackColor = true;
             // 
             // Form2
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(813, 450);
+            this.Controls.Add(this.checkBox2);
             this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.delete);
             this.Controls.Add(this.redo);
@@ -183,7 +193,7 @@
         private System.Windows.Forms.Button undo;
         private System.Windows.Forms.Button redo;
         private System.Windows.Forms.Button delete;
-        private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.CheckBox checkBox2;
     }
 }
