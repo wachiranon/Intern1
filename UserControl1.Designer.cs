@@ -30,11 +30,16 @@
         {
             this.components = new System.ComponentModel.Container();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.timer2 = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
             // timer1
             // 
-            this.timer1.Interval = 20;
+            this.timer1.Interval = 10;
+            // 
+            // timer2
+            // 
+            this.timer2.Interval = 10;
             // 
             // UserControl1
             // 
@@ -51,5 +56,6 @@
         #endregion
 
         private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.Timer timer2;
     }
 }

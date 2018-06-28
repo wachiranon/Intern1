@@ -165,10 +165,12 @@ namespace WindowsFormsApp1
             {
                 if (this.checkBox1.Checked == true)
                 {
-                    Area.undo_anime(1);
+                    float speed = int.Parse(InputSpeed.Text);
+                    Area.undo_anime(1,speed);
                 }if (this.checkBox2.Checked == true)
                 {
-                    Area.undo_anime(2);
+                    float time = int.Parse(InputTime.Text);
+                    Area.undo_anime(2,time);
                 }
             }
             else
@@ -179,7 +181,23 @@ namespace WindowsFormsApp1
 
         private void redo_Click(object sender, EventArgs e)
         {
-            Area.redo();
+            if (this.checkBox1.Checked == true || this.checkBox2.Checked == true)
+            {
+                if (this.checkBox1.Checked == true)
+                {
+                    float speed = int.Parse(InputSpeed.Text);
+                    Area.redo_anime(1, speed);
+                }
+                if (this.checkBox2.Checked == true)
+                {
+                    float time = int.Parse(InputTime.Text);
+                    Area.redo_anime(2, time);
+                }
+            }
+            else
+            {
+                Area.redo();
+            }
         }
 
         private void delete_Click(object sender, EventArgs e)
@@ -188,6 +206,16 @@ namespace WindowsFormsApp1
         }
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label2_Click(object sender, EventArgs e)
         {
 
         }

@@ -38,8 +38,12 @@
             this.redo = new System.Windows.Forms.Button();
             this.delete = new System.Windows.Forms.Button();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
-            this.Area = new WindowsFormsApp1.UserControl1();
             this.checkBox2 = new System.Windows.Forms.CheckBox();
+            this.InputSpeed = new System.Windows.Forms.TextBox();
+            this.InputTime = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.Area = new WindowsFormsApp1.UserControl1();
+            this.label2 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // PointNum
@@ -99,7 +103,7 @@
             // 
             // undo
             // 
-            this.undo.Location = new System.Drawing.Point(511, 72);
+            this.undo.Location = new System.Drawing.Point(511, 67);
             this.undo.Name = "undo";
             this.undo.Size = new System.Drawing.Size(75, 23);
             this.undo.TabIndex = 8;
@@ -109,7 +113,7 @@
             // 
             // redo
             // 
-            this.redo.Location = new System.Drawing.Point(511, 101);
+            this.redo.Location = new System.Drawing.Point(512, 97);
             this.redo.Name = "redo";
             this.redo.Size = new System.Drawing.Size(75, 23);
             this.redo.TabIndex = 9;
@@ -138,6 +142,40 @@
             this.checkBox1.UseVisualStyleBackColor = true;
             this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
+            // checkBox2
+            // 
+            this.checkBox2.AutoSize = true;
+            this.checkBox2.Location = new System.Drawing.Point(593, 101);
+            this.checkBox2.Name = "checkBox2";
+            this.checkBox2.Size = new System.Drawing.Size(49, 17);
+            this.checkBox2.TabIndex = 12;
+            this.checkBox2.Text = "Time";
+            this.checkBox2.UseVisualStyleBackColor = true;
+            // 
+            // InputSpeed
+            // 
+            this.InputSpeed.Location = new System.Drawing.Point(656, 69);
+            this.InputSpeed.Name = "InputSpeed";
+            this.InputSpeed.Size = new System.Drawing.Size(66, 20);
+            this.InputSpeed.TabIndex = 13;
+            // 
+            // InputTime
+            // 
+            this.InputTime.Location = new System.Drawing.Point(657, 98);
+            this.InputTime.Name = "InputTime";
+            this.InputTime.Size = new System.Drawing.Size(66, 20);
+            this.InputTime.TabIndex = 14;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(730, 101);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(44, 13);
+            this.label1.TabIndex = 15;
+            this.label1.Text = "Second";
+            this.label1.Click += new System.EventHandler(this.label1_Click);
+            // 
             // Area
             // 
             this.Area.BackColor = System.Drawing.SystemColors.ButtonHighlight;
@@ -147,21 +185,25 @@
             this.Area.TabIndex = 5;
             this.Area.Load += new System.EventHandler(this.userControl11_Load);
             // 
-            // checkBox2
+            // label2
             // 
-            this.checkBox2.AutoSize = true;
-            this.checkBox2.Location = new System.Drawing.Point(593, 96);
-            this.checkBox2.Name = "checkBox2";
-            this.checkBox2.Size = new System.Drawing.Size(49, 17);
-            this.checkBox2.TabIndex = 12;
-            this.checkBox2.Text = "Time";
-            this.checkBox2.UseVisualStyleBackColor = true;
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(730, 72);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(68, 13);
+            this.label2.TabIndex = 16;
+            this.label2.Text = "Pixel/mili-sec";
+            this.label2.Click += new System.EventHandler(this.label2_Click);
             // 
             // Form2
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(813, 450);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.InputTime);
+            this.Controls.Add(this.InputSpeed);
             this.Controls.Add(this.checkBox2);
             this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.delete);
@@ -195,5 +237,9 @@
         private System.Windows.Forms.Button delete;
         private System.Windows.Forms.CheckBox checkBox1;
         private System.Windows.Forms.CheckBox checkBox2;
+        private System.Windows.Forms.TextBox InputSpeed;
+        private System.Windows.Forms.TextBox InputTime;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label2;
     }
 }

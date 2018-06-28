@@ -24,6 +24,7 @@ namespace WindowsFormsApp1
         {
             InitializeComponent();
         }
+        int speed=1,speed_x,speed_y;
         
         private void UserControl1_Load(object sender, EventArgs e)
         {
@@ -39,7 +40,90 @@ namespace WindowsFormsApp1
             this.KeyDown += undo_key;
             this.KeyDown += redo_key;
 
-            
+            timer2.Tick += (s2, e2) =>
+            {
+                this.Invoke(new MethodInvoker(() =>
+                {
+                    if (multi_redo.Count != 0 && redo_point.Count != 0)
+                    {
+                        /////
+                        if (TimeCheck == 1)
+                        {
+                            for (int i = 0; i < multi_redo[multi_redo.Count - 1]; i++)
+                            {
+                                Control p = redo_point[redo_point.Count - 1 - i].targetPoint;
+
+                                PointHistory p_h = new PointHistory();
+                                p_h.targetPoint = p;
+                                p_h.X = p.Left;
+                                p_h.Y = p.Top;
+                                if (!undo_point.Contains(p_h))
+                                {
+                                    undo_point.Add(p_h);
+                                }
+                                speed_x = speed;
+                                speed_y = speed;
+                            }
+
+                            TimeCheck = 2;
+                        }
+                        if (TimeCheck == 2)
+                        {
+                            int count_multi = 0;
+                            int last = redo_point.Count - 1;
+                            while (count_multi < multi_redo[multi_redo.Count - 1])
+                            {
+                                int d_x = Math.Abs(redo_point[last - count_multi].targetPoint.Location.X - redo_point[last - count_multi].X);
+                                int d_y = Math.Abs(redo_point[last - count_multi].targetPoint.Location.Y - redo_point[last - count_multi].Y);
+                                if (speed > d_x) { speed_x = d_x; }
+                                if (redo_point[last - count_multi].targetPoint.Location.X < redo_point[last - count_multi].X)
+                                {
+                                    redo_point[last - count_multi].targetPoint.Left += speed_x;//Location = new Point(undo_point[undo_point.Count - 1].targetPoint.Location.X + 10, undo_point[undo_point.Count - 1].targetPoint.Location.Y);
+                                }
+                                else if (redo_point[last - count_multi].targetPoint.Location.X > redo_point[last - count_multi].X)
+                                {
+                                    redo_point[last - count_multi].targetPoint.Left -= speed_x;//Location = new Point(undo_point[undo_point.Count - 1].targetPoint.Location.X - 10, undo_point[undo_point.Count - 1].targetPoint.Location.Y);
+                                }
+                                if(speed > d_y) { speed_y = d_y; }
+                                if (redo_point[last - count_multi].targetPoint.Location.Y < redo_point[last - count_multi].Y)
+                                {
+                                    redo_point[last - count_multi].targetPoint.Top += speed_y;//Location = new Point(undo_point[undo_point.Count - 1].targetPoint.Location.X, undo_point[undo_point.Count - 1].targetPoint.Location.Y + 10);
+                                }
+                                else if (redo_point[last - count_multi].targetPoint.Location.Y > redo_point[last - count_multi].Y)
+                                {
+                                    redo_point[last - count_multi].targetPoint.Top -= speed_y;//Location = new Point(undo_point[undo_point.Count - 1].targetPoint.Location.X, undo_point[undo_point.Count - 1].targetPoint.Location.Y - 10);
+                                }
+                                count_multi++;
+                            }
+                            if ((redo_point[last].targetPoint.Location.X == redo_point[last].X) && (redo_point[last].targetPoint.Location.Y == redo_point[last].Y))
+                            {
+                                TimeCheck = 3;
+                            }
+                        }
+                        if (TimeCheck == 3)
+                        {
+                            for (int i = 0; i < multi_redo[multi_redo.Count - 1]; i++)
+                            {
+                                redo_point.RemoveAt(redo_point.Count - 1);
+                            }
+
+                            multi_point.Add(multi_redo[multi_redo.Count - 1]);
+                            multi_redo.RemoveAt(multi_redo.Count - 1);
+
+                            TimeCheck = 0;
+                            speed = 1;
+                            speed_x = 0;
+                            speed_y = 0;
+                            this.timer2.Stop();
+                        }
+                        /////
+                    }
+                    else { this.timer2.Stop(); }
+                }
+                ));
+            };
+
+
             timer1.Tick += (s2,e2) =>
             {
                 this.Invoke(new MethodInvoker(()=>
@@ -61,6 +145,8 @@ namespace WindowsFormsApp1
                                 {
                                     redo_point.Add(p_h);
                                 }
+                                speed_x = speed;
+                                speed_y = speed;
                             }
 
                             TimeCheck = 2;
@@ -71,21 +157,25 @@ namespace WindowsFormsApp1
                             int last = undo_point.Count-1;
                             while (count_multi < multi_point[multi_point.Count - 1])
                             {
+                                int d_x = Math.Abs(undo_point[last - count_multi].targetPoint.Location.X - undo_point[last - count_multi].X);
+                                int d_y = Math.Abs(undo_point[last - count_multi].targetPoint.Location.Y - undo_point[last - count_multi].Y);
+                                if (speed > d_x) { speed_x = d_x; }
                                 if (undo_point[last-count_multi].targetPoint.Location.X < undo_point[last - count_multi].X)
                                 {
-                                    undo_point[last - count_multi].targetPoint.Left += 1;//Location = new Point(undo_point[undo_point.Count - 1].targetPoint.Location.X + 10, undo_point[undo_point.Count - 1].targetPoint.Location.Y);
+                                    undo_point[last - count_multi].targetPoint.Left += speed_x;//Location = new Point(undo_point[undo_point.Count - 1].targetPoint.Location.X + 10, undo_point[undo_point.Count - 1].targetPoint.Location.Y);
                                 }
                                 else if (undo_point[last - count_multi].targetPoint.Location.X > undo_point[last - count_multi].X)
                                 {
-                                    undo_point[last - count_multi].targetPoint.Left -= 1;//Location = new Point(undo_point[undo_point.Count - 1].targetPoint.Location.X - 10, undo_point[undo_point.Count - 1].targetPoint.Location.Y);
+                                    undo_point[last - count_multi].targetPoint.Left -= speed_x;//Location = new Point(undo_point[undo_point.Count - 1].targetPoint.Location.X - 10, undo_point[undo_point.Count - 1].targetPoint.Location.Y);
                                 }
+                                if(speed > d_y) { speed_y = d_y; }
                                 if (undo_point[last - count_multi].targetPoint.Location.Y < undo_point[last - count_multi].Y)
                                 {
-                                    undo_point[last - count_multi].targetPoint.Top += 1;//Location = new Point(undo_point[undo_point.Count - 1].targetPoint.Location.X, undo_point[undo_point.Count - 1].targetPoint.Location.Y + 10);
+                                    undo_point[last - count_multi].targetPoint.Top += speed_y;//Location = new Point(undo_point[undo_point.Count - 1].targetPoint.Location.X, undo_point[undo_point.Count - 1].targetPoint.Location.Y + 10);
                                 }
                                 else if (undo_point[last - count_multi].targetPoint.Location.Y > undo_point[last - count_multi].Y)
                                 {
-                                    undo_point[last - count_multi].targetPoint.Top -= 1;//Location = new Point(undo_point[undo_point.Count - 1].targetPoint.Location.X, undo_point[undo_point.Count - 1].targetPoint.Location.Y - 10);
+                                    undo_point[last - count_multi].targetPoint.Top -= speed_y;//Location = new Point(undo_point[undo_point.Count - 1].targetPoint.Location.X, undo_point[undo_point.Count - 1].targetPoint.Location.Y - 10);
                                 }
                                 count_multi++;
                             }
@@ -105,6 +195,9 @@ namespace WindowsFormsApp1
                             multi_point.RemoveAt(multi_point.Count - 1);
 
                             TimeCheck = 0;
+                            speed = 1;
+                            speed_x = 0;
+                            speed_y = 0;
                             this.timer1.Stop();
                         }
                         /////
@@ -542,16 +635,76 @@ namespace WindowsFormsApp1
         // 2 = move point
         // 3 = remove undo list
 
-        public void undo_anime(int choice)
+        public void undo_anime(int choice,float t)
         {
-            if (choice == 2)
+            //V = S/T
+            //S = V*T
+            //T = S/V
+            if (multi_point.Count != 0 && undo_point.Count != 0)
             {
-                timer1.Interval = choice;
+                int dis_x = Math.Abs(undo_point[undo_point.Count - 1].targetPoint.Location.X - undo_point[undo_point.Count - 1].X);
+                int dis_y = Math.Abs(undo_point[undo_point.Count - 1].targetPoint.Location.Y - undo_point[undo_point.Count - 1].Y);
+                double distance = Math.Sqrt((dis_x * dis_x) + (dis_y * dis_y));
+                double time;
+                if (choice == 1)//Fix Speed
+                {
+                    //time = (int)distance;
+                    //time = (int)(time/ (t));
+                    //timer1.Interval = time;
+                    speed = (int)t;
+                }
+                else if (choice == 2)//Fix Time
+                {
+
+                    time = t * 1000;
+                    speed = (int)(distance / time);
+                    if ((distance / time) < 1)
+                    {
+                        speed = 1;
+                        time = time / distance;
+
+                        timer1.Interval = (int)time;
+                    }
+
+                }
+                this.timer1.Start();
+                TimeCheck = 1;
             }
-            this.timer1.Start();
-            TimeCheck = 1;
         }
-        
+
+        public void redo_anime(int choice, float t)
+        {
+            //V = S/T
+            //S = V*T
+            //T = S/V
+            if (multi_redo.Count != 0 && redo_point.Count != 0)
+            {
+                int dis_x = Math.Abs(redo_point[redo_point.Count - 1].targetPoint.Location.X - redo_point[redo_point.Count - 1].X);
+                int dis_y = Math.Abs(redo_point[redo_point.Count - 1].targetPoint.Location.Y - redo_point[redo_point.Count - 1].Y);
+                double distance = Math.Sqrt((dis_x * dis_x) + (dis_y * dis_y));
+                int time;
+                if (choice == 1)//Fix Speed
+                {
+                    //time = (int)distance;
+                    //time = (int)(time / (t));
+                    //timer2.Interval = time;
+                    speed = (int)t;
+                }
+                else if (choice == 2)//Fix Time
+                {
+                    time = (int)t;
+                    //timer2.Interval = time;
+                    time = (int)(t * 1000 / timer2.Interval);
+                    //timer1.Interval = time;
+                    speed = (int)(distance / time);
+                    if (speed < 1) { speed = 1; }
+
+                }
+                this.timer2.Start();
+                TimeCheck = 1;
+            }
+        }
+
         public void undo()
         {
             if (multi_point.Count != 0 && undo_point.Count != 0)
