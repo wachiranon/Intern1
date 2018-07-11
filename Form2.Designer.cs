@@ -44,6 +44,9 @@
             this.label1 = new System.Windows.Forms.Label();
             this.Area = new WindowsFormsApp1.UserControl1();
             this.label2 = new System.Windows.Forms.Label();
+            this.button5 = new System.Windows.Forms.Button();
+            this.button6 = new System.Windows.Forms.Button();
+            this.button7 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // PointNum
@@ -75,7 +78,7 @@
             // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(473, 26);
+            this.button3.Location = new System.Drawing.Point(473, 14);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(75, 23);
             this.button3.TabIndex = 4;
@@ -179,7 +182,7 @@
             // Area
             // 
             this.Area.BackColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.Area.Location = new System.Drawing.Point(23, 72);
+            this.Area.Location = new System.Drawing.Point(23, 100);
             this.Area.Name = "Area";
             this.Area.Size = new System.Drawing.Size(470, 366);
             this.Area.TabIndex = 5;
@@ -195,11 +198,44 @@
             this.label2.Text = "Pixel/mili-sec";
             this.label2.Click += new System.EventHandler(this.label2_Click);
             // 
+            // button5
+            // 
+            this.button5.Location = new System.Drawing.Point(456, 43);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(105, 23);
+            this.button5.TabIndex = 17;
+            this.button5.Text = "Load Webbserver";
+            this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.button5_Click);
+            // 
+            // button6
+            // 
+            this.button6.Location = new System.Drawing.Point(63, 66);
+            this.button6.Name = "button6";
+            this.button6.Size = new System.Drawing.Size(75, 23);
+            this.button6.TabIndex = 18;
+            this.button6.Text = "Add text";
+            this.button6.UseVisualStyleBackColor = true;
+            this.button6.Click += new System.EventHandler(this.button6_Click);
+            // 
+            // button7
+            // 
+            this.button7.Location = new System.Drawing.Point(155, 66);
+            this.button7.Name = "button7";
+            this.button7.Size = new System.Drawing.Size(75, 23);
+            this.button7.TabIndex = 19;
+            this.button7.Text = "Add Pic";
+            this.button7.UseVisualStyleBackColor = true;
+            this.button7.Click += new System.EventHandler(this.button7_Click);
+            // 
             // Form2
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(813, 450);
+            this.ClientSize = new System.Drawing.Size(819, 476);
+            this.Controls.Add(this.button7);
+            this.Controls.Add(this.button6);
+            this.Controls.Add(this.button5);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.InputTime);
@@ -241,5 +277,8 @@
         private System.Windows.Forms.TextBox InputTime;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Button button5;
+        private System.Windows.Forms.Button button6;
+        private System.Windows.Forms.Button button7;
     }
 }

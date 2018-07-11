@@ -6,10 +6,15 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 using System.Windows.Forms;
 using Newtonsoft.Json;
 using System.IO;
 using System.Net;
+
+using System.Reflection;
+using SharpConnect.WebServers;
+using SharpConnect;
 
 namespace WindowsFormsApp1
 {
@@ -25,9 +30,33 @@ namespace WindowsFormsApp1
             InitializeComponent();
         }
         int speed=1,speed_x,speed_y;
-        
+        //AppHost testApp;
+        SharpConnect.AppHost testApp;
+
+
         private void UserControl1_Load(object sender, EventArgs e)
         {
+            ///--------------Webserver
+            //testApp = new AppHost(); ;
+            testApp = new SharpConnect.AppHost();
+            testApp.RegisterModule(new MyModule());
+            testApp.RegisterModule(new MyModule2());
+            testApp.RegisterModule(new MyModule3());
+            testApp.RegisterModule(new MyAdvanceMathModule());
+            testApp.RegisterModule(new MMath1());
+
+            //Area.MouseDown += Area.Selected;
+            WebServer webServer = new WebServer(8080, true, testApp.HandleRequest);
+            //test websocket
+            var webSocketServer = new WebSocketServer();
+            webSocketServer.SetOnNewConnectionContext(ctx =>
+            {
+                ctx.SetMessageHandler(testApp.HandleWebSocket);
+            });
+            webServer.WebSocketServer = webSocketServer;
+            webServer.Start();
+            //-----------------Webserver
+
             this.KeyDown += MyControl_SelectAll;
             
             this.MouseDown += UserControl1_MouseDown;
@@ -123,6 +152,7 @@ namespace WindowsFormsApp1
                 ));
             };
 
+            
 
             timer1.Tick += (s2,e2) =>
             {
@@ -290,6 +320,38 @@ namespace WindowsFormsApp1
             selectedPoint.Clear();   
         }
 
+        public void AddTxtBox()
+        {
+            int count = 0;
+            foreach (Panel p in this.Controls) { count++; }
+            Panel area = new Panel();
+            TextBox t = new TextBox();
+            t.Multiline = true;
+            t.Size = new Size(50, 20);
+            t.Location = new Point(2, 2);
+            t.Tag = count;
+
+            area.Size = new Size(t.Size.Width + 4, t.Size.Height + 4);
+            area.Location = new Point(0, count * 25);
+            area.BackColor = Color.Blue;
+            area.MouseDown += Button1_MouseDown;
+            area.MouseUp += Button1_MouseUp;
+            area.MouseMove += Button1_Move;
+            area.Tag = "t";
+            area.Controls.Add(t);
+            
+            PointHistory p_h = new PointHistory();
+            p_h.targetPoint = area;
+            p_h.X = area.Location.X;
+            p_h.Y = area.Location.Y;
+            p_h.messegetxt = t.Text;
+            p_h.sizetxtbox_w = t.Size.Width;
+            p_h.sizetxtbox_h = t.Size.Height;
+
+            this.Controls.Add(area);
+
+        }
+
         public void paint_point(int num)
         {
             for (int i = 0; i < num; i++)
@@ -333,15 +395,18 @@ namespace WindowsFormsApp1
                 //    p_h.BgColor = p.BackColor;
                     p_h.X = p.Location.X;
                     p_h.Y = p.Location.Y;
+                    if ((string)p.Tag == "t")
+                    {
+                        foreach (TextBox t in p.Controls)
+                        {
+                            p_h.messegetxt = t.Text;
+                            p_h.sizetxtbox_w = t.Size.Width;
+                            p_h.sizetxtbox_h = t.Size.Height;
+                        }
+                    }
                     Point_his.Add(p_h);
-                    //redo_point.Add(p_h);
-                    //if (!undo_point.Contains(p_h) && selectedPoint.Count > 1)
-                    //{
-                    //    undo_point.Add(p_h);
-                    //}
                 }
                 multi_point.Add(selectedPoint.Count);
-                //multi_point.Add(selectedPoint.Count);
                 if (selectedPoint.Count == 1)
                 {
                     
@@ -352,7 +417,6 @@ namespace WindowsFormsApp1
             }
             
         }
-
         public void Button1_MouseDown(object sender, MouseEventArgs e)
         {
             mouse_move = true;
@@ -364,37 +428,54 @@ namespace WindowsFormsApp1
             {
                 PointHistory p_h = new PointHistory();
                 p_h.targetPoint = butt;
-               // p_h.BgColor = butt.BackColor;
                 p_h.X = butt.Location.X;
                 p_h.Y = butt.Location.Y;
+                if (butt.Tag == "t")
+                {
+                    foreach (TextBox t in butt.Controls)
+                    {
+                        p_h.sizetxtbox_w = t.Size.Width;
+                        p_h.sizetxtbox_h = t.Size.Height;
+                        p_h.messegetxt = t.Text;
+                    }
+                }
                 selectedPoint.Add(butt);
                 Point_his.Add(p_h);
                 if (!undo_point.Contains(p_h))
                 {
                     undo_point.Add(p_h);
                 }
-                //multi_point.Add(selectedPoint.Count);
-
             }
-
-            //this.MouseUp += Selected;
         }
+
         public void Button1_Move(object sender, MouseEventArgs e)
         {
-            //this.Text = "Move";
             if(mouse_move == true)
             {
-                //multi_point.Add(selectedPoint.Count);
                 int d_x = e.X - l_x;
                 int d_y = e.Y - l_y;
-                
+
                 Panel p = new Panel();
+                TextBox t = new TextBox();
                 foreach (Control c in selectedPoint)
                 {
                     p = (Panel)c;
-                    p.Location = new Point(p.Left + d_x, p.Top + d_y);
+                    if(ModifierKeys == Keys.Alt)
+                    {
+                        p.Size = new Size(p.Size.Width + d_x,p.Size.Height + d_y);
+                        foreach (object d in p.Controls)
+                        {
+                            t = (TextBox)d;
+                            t.Size = new Size(t.Size.Width + d_x,t.Size.Height + d_y);
+                        }
+                        l_x = e.X;
+                        l_y = e.Y;
+                    }
+                    else
+                    {
+                        p.Location = new Point(p.Left + d_x, p.Top + d_y);
+                    }
                 }
-                
                 redo_point.Clear();
                 multi_redo.Clear();
             }
@@ -403,55 +484,222 @@ namespace WindowsFormsApp1
         List<int> multi_point = new List<int>();
         List<int> multi_redo = new List<int>();
 
+        public void load_form_server()
+        {
+            string result;
+            
+            var httpWebRequest = (HttpWebRequest)WebRequest.Create("http://localhost:8080/savejson.json");
+            var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+            using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
+            {
+                result = streamReader.ReadToEnd();
+                Console.WriteLine(result);
+            }
+            List<point_json> savePanel = new List<point_json>();
+            List<point_json> undoList = new List<point_json>();
+            List<int> hisList = new List<int>();
+
+            string[] data = result.Split('|');
+            if(data.Length == 3)
+            {
+                this.Controls.Clear();
+                multi_point.Clear();
+                undo_point.Clear();
+                savePanel = JsonConvert.DeserializeObject<List<point_json>>(data[0]);
+                undoList = JsonConvert.DeserializeObject<List<point_json>>(data[1]);
+                hisList = JsonConvert.DeserializeObject<List<int>>(data[2]);
+
+                //----Add panel----//
+                for (int i = 0; i < savePanel.Count; i++)
+                {
+                    Panel area = new Panel();
+                    area.Size = new Size(10, 10);
+                    area.Location = new Point(savePanel[i].X, savePanel[i].Y);
+                    area.BackColor = Color.Blue;
+                    area.MouseDown += Button1_MouseDown;
+                    area.MouseUp += Button1_MouseUp;
+                    area.MouseMove += Button1_Move;
+                    area.Tag = savePanel[i].T;
+                    PointHistory p_h = new PointHistory();
+                    p_h.targetPoint = area;
+                    p_h.X = savePanel[i].X;
+                    p_h.Y = savePanel[i].Y;
+
+                    this.Controls.Add(area);
+                }
+                //----Add panel----//
+
+                //----Add Undo-----//
+                while (undoList.Count > 0)
+                {
+                    
+                    foreach (Panel u1 in this.Controls)
+                    {
+                        if ((string)u1.Tag == undoList[0].T)
+                        {
+                            PointHistory u_h = new PointHistory();
+                            u_h.targetPoint = u1;
+                            u_h.X = undoList[0].X;
+                            u_h.Y = undoList[0].Y;
+                            undo_point.Add(u_h);
+                            undoList.RemoveAt(0);
+                            break;
+                        }
+                    }
+                }
+                //----Add Undo-----//
+                //----Add Multipoint----//
+                multi_point = hisList;
+            }
+        }
+
+
+       
+
+        public string filePhotoPath;
+        public void ImportPictureBox()
+        {
+            OpenFileDialog opf = new OpenFileDialog();
+            opf.Filter = "Choose Image(*.jpg;*.png)|*.jpg;*.png ";
+            if (opf.ShowDialog() == DialogResult.OK)
+            {
+                PictureBox newptb = new PictureBox();
+                Panel mypanel1 = new Panel();
+                mypanel1.Size = new Size(50, 50);
+                mypanel1.BackColor = Color.Blue;
+                mypanel1.Tag = "p";
+                newptb.Location = new Point(mypanel1.Left + 9, mypanel1.Top + 10);
+                var image = Image.FromFile(opf.FileName);
+                newptb.Image = image;
+                newptb.SizeMode = PictureBoxSizeMode.StretchImage;
+                newptb.Size = new Size(32, 32);
+                newptb.Tag = "p";
+                
+                mypanel1.Controls.Add(newptb);
+                mypanel1.MouseDown += Button1_MouseDown;
+                mypanel1.MouseUp += Button1_MouseUp;
+                mypanel1.MouseMove += Button1_Move;
+                Controls.Add(mypanel1);
+                filePhotoPath = opf.FileName;
+                //Read_Pnl(Controls);
+            }
+        }
+        public string base64String;
+
+
+
+        public class TargetUndo
+        {
+            public int X;
+            public int Y;
+            public int T;
+        }
+
+        public class SelectUndo
+        {
+            public int Select;
+        }
+
+        class point_json
+        {
+            public int X;
+            public int Y;
+            public string T;
+            public string path;
+            public int sizetxt_X;
+            public int sizetxt_y;
+            public string messeage;
+        }
+
+
         public void Save_point()
         {
+            
+            using (Image image = Image.FromFile(filePhotoPath))
+            {
+                using (MemoryStream m = new MemoryStream())
+                {
+                    image.Save(m, image.RawFormat);
+                    byte[] imageBytes = m.ToArray();
+
+                    base64String = Convert.ToBase64String(imageBytes);
+                }
+            }
             List<point_json> p_d = new List<point_json>();
-            ////int i = 0;
-            //using (FileStream fs = new FileStream("point.bin", FileMode.Create))
-            //{
-            //    using (BinaryWriter w = new BinaryWriter(fs))
-            //    {
             foreach (Control p in this.Controls)
             {
                 point_json js = new point_json();
                 //            w.Write(p.Left);
                 //            w.Write(p.Top);
-                js.T = (int)p.Tag;
+                js.T = (string)p.Tag;
                 js.X = p.Left;
                 js.Y = p.Top;
+                if ((string)p.Tag == "t")
+                {
+                    foreach(TextBox t in p.Controls)
+                    {
+                        js.sizetxt_X = t.Size.Width;
+                        js.sizetxt_y = t.Size.Height;
+                        js.messeage = t.Text;
+                    }
+                }
+                else if((string)p.Tag == "p")
+                {
+                    foreach(PictureBox pb in p.Controls)
+                    {
+                        js.path = base64String;
+                    }
+                }
                 p_d.Add(js);
 
             }
-            //        fs.Flush();
-            //        fs.Close();
-            //    }
-            //}
+            //------Save Image----//
+
+            
+
+            //--------Point----//
             JsonSerializer serializer = new JsonSerializer();
+
             using (StreamWriter sw = new StreamWriter("SavePanel.json"))
             using (JsonWriter writer = new JsonTextWriter(sw))
             {
                 string json = JsonConvert.SerializeObject(p_d);
                 serializer.Serialize(writer, p_d);
             }
+
+            //----
+
+            //-------Undo List-----//
             if (undo_point.Count > 0)
             {
                 List<point_json> undo_js = new List<point_json>();
-                for(int i = 0; i <= undo_point.Count-1; i++)
+                for (int i = 0; i <= undo_point.Count - 1; i++)
                 {
                     point_json new_u = new point_json();
-                    new_u.T = (int)undo_point[i].targetPoint.Tag;
+                    new_u.T = (string)undo_point[i].targetPoint.Tag;
                     new_u.X = undo_point[i].X;
                     new_u.Y = undo_point[i].Y;
+                    if ((string)undo_point[i].targetPoint.Tag == "t")
+                    {
+                        new_u.sizetxt_X = undo_point[i].sizetxtbox_w;
+                        new_u.sizetxt_y = undo_point[i].sizetxtbox_h;
+                        new_u.messeage = undo_point[i].messegetxt;
+                    }
+                    else if((string)undo_point[i].targetPoint.Tag == "p")
+                    {
+                        //new_u.path = undo_point[i].
+                    }
                     undo_js.Add(new_u);
                 }
                 JsonSerializer serial2 = new JsonSerializer();
                 using (StreamWriter sw2 = new StreamWriter("History.json"))
                 using (JsonWriter writer2 = new JsonTextWriter(sw2))
                 {
-                    serial2.Serialize(writer2,undo_js );
+                    serial2.Serialize(writer2, undo_js);
                     //serial2.Serialize(writer2, multi_point);
                 }
             }
+            //---------Undo Count--------//
             if (multi_point.Count > 0)
             {
                 JsonSerializer serial3 = new JsonSerializer();
@@ -461,68 +709,25 @@ namespace WindowsFormsApp1
                     serial3.Serialize(writer3, multi_point);
                 }
             }
+            ///-----------save Json-----------
+            ///
+            ///-----------save to other computer
         }
-        
-        class point_json
-        {
-            public int X;
-            public int Y;
-            public int T;
-        } 
+
+
         public void Load_point()
         {
             this.Controls.Clear();
-            //using (FileStream fs = new FileStream("point.bin", FileMode.Open))
-            //{
-            //    using (BinaryReader r = new BinaryReader(fs))
-            //    {
-            //        int i = 0;
-            //        while (r.BaseStream.Length != r.BaseStream.Position)
-            //        {
-            //            int position_x = r.ReadInt32();
-            //            int position_y = r.ReadInt32();
-
-            //            //paint_point(position_x, position_y);
-            //            Panel area = new Panel();
-            //            area.Size = new Size(10, 10);
-            //            area.Location = new Point(position_x, position_y);
-            //            area.BackColor = Color.Blue;
-            //            area.MouseDown += Button1_MouseDown;
-            //            area.MouseUp += Button1_MouseUp;
-            //            area.MouseMove += Button1_Move;
-            //            area.Tag = i;
-            //            PointHistory p_h = new PointHistory();
-            //            p_h.targetPoint = area;
-            //            //p_h.BgColor = area.BackColor;
-            //            //p_h.command = CommandKind.BgColor;
-            //            p_h.X = area.Location.X;
-            //            p_h.Y = area.Location.Y;
-            //            //if (!undo_point.Contains(p_h))
-            //            //{
-            //              //  undo_point.Add(p_h);
-            //            //}
-            //            //        Point_his.Add(p_h);
-            //            this.Controls.Add(area);
-            //            i++;
-            //        }
-            //        fs.Flush();
-            //        fs.Close();
-            //        //multi_point.Add(i + 1);
-            //    }
-            //}
             ///// paint point///////
+            string filepath;
+            Image im;
             List<point_json> p = new List<point_json>();
             using (FileStream f_p = new FileStream("SavePanel.json", FileMode.Open))
             {
                 using (StreamReader s_p = new StreamReader(f_p))
                 {
-                    //using (JsonReader r_p = new JsonTextReader(s_p))
-                    //{
                     string r_j = s_p.ReadToEnd();
                     p = JsonConvert.DeserializeObject<List<point_json>>(r_j);
-                    ////
-                    //}
-                    //f_p.Flush();
                     f_p.Close();
                 }
 
@@ -537,6 +742,31 @@ namespace WindowsFormsApp1
                 area.MouseUp += Button1_MouseUp;
                 area.MouseMove += Button1_Move;
                 area.Tag = p[i].T;
+                if(p[i].T == "t")
+                {
+                    TextBox txt = new TextBox();
+                    txt.Multiline = true;
+                    txt.Size = new Size(p[i].sizetxt_X, p[i].sizetxt_y);
+                    txt.Text = p[i].messeage;
+                    txt.Location = new Point(2, 2);
+                    area.Size = new Size(p[i].sizetxt_X+4, p[i].sizetxt_y+4);
+                    area.Controls.Add(txt);
+                }else if(p[i].T == "p")
+                {
+                    PictureBox newptb = new PictureBox();
+                    newptb.SizeMode = PictureBoxSizeMode.StretchImage;
+                    newptb.Size = new Size(32, 32);
+                    filepath = p[i].path;
+                    Byte[] b = Convert.FromBase64String(filepath);
+                    using (var ms = new MemoryStream(b, 0, b.Length))
+                    {
+                        im = Image.FromStream(ms, true);
+                        newptb.Image = im;
+                        newptb.Location = new Point(9, 10);
+                        area.Size = new Size(50, 50);
+                        area.Controls.Add(newptb);
+                    }
+                }
                 PointHistory p_h = new PointHistory();
                 p_h.targetPoint = area;
                 p_h.X = p[i].X;
@@ -564,13 +794,19 @@ namespace WindowsFormsApp1
                 //Panel u1 = new Panel();
                 foreach (Panel u1 in this.Controls)
                 {
-                    if ((int)u1.Tag == u[0].T)
+                    if ((string)u1.Tag == u[0].T)
                     {
                         PointHistory u_h = new PointHistory();
                         //u1.BackColor = Color.Blue;
                         u_h.targetPoint = u1;
                         u_h.X = u[0].X;
                         u_h.Y = u[0].Y;
+                        if (u[0].T == "t")
+                        {
+                            u_h.sizetxtbox_w = u[0].sizetxt_X;
+                            u_h.sizetxtbox_h = u[0].sizetxt_y;
+                            u_h.messegetxt = u[0].messeage;
+                        }
                         undo_point.Add(u_h);
                         u.RemoveAt(0);
                         break;
@@ -656,7 +892,7 @@ namespace WindowsFormsApp1
                 else if (choice == 2)//Fix Time
                 {
 
-                    time = t * 1000;
+                    time = (t+2) * 1000;
                     speed = (int)(distance / time);
                     if ((distance / time) < 1)
                     {
@@ -682,7 +918,7 @@ namespace WindowsFormsApp1
                 int dis_x = Math.Abs(redo_point[redo_point.Count - 1].targetPoint.Location.X - redo_point[redo_point.Count - 1].X);
                 int dis_y = Math.Abs(redo_point[redo_point.Count - 1].targetPoint.Location.Y - redo_point[redo_point.Count - 1].Y);
                 double distance = Math.Sqrt((dis_x * dis_x) + (dis_y * dis_y));
-                int time;
+                double time;
                 if (choice == 1)//Fix Speed
                 {
                     //time = (int)distance;
@@ -692,12 +928,15 @@ namespace WindowsFormsApp1
                 }
                 else if (choice == 2)//Fix Time
                 {
-                    time = (int)t;
-                    //timer2.Interval = time;
-                    time = (int)(t * 1000 / timer2.Interval);
-                    //timer1.Interval = time;
+                    time = (t+2) * 1000;
                     speed = (int)(distance / time);
-                    if (speed < 1) { speed = 1; }
+                    if ((distance / time) < 1)
+                    {
+                        speed = 1;
+                        time = time / distance;
+
+                        timer2.Interval = (int)time;
+                    }
 
                 }
                 this.timer2.Start();
@@ -714,13 +953,33 @@ namespace WindowsFormsApp1
                     Control p = undo_point[undo_point.Count - 1].targetPoint;
 
                     PointHistory p_h = new PointHistory();
+                    
                     p_h.targetPoint = p;
                     p_h.X = p.Left;
                     p_h.Y = p.Top;
+                    p_h.targetPoint.Tag = p.Tag;
+                    if (undo_point[undo_point.Count - 1].targetPoint.Tag == "t")
+                    {
+                        foreach (TextBox t in undo_point[undo_point.Count - 1].targetPoint.Controls)
+                        {
+                            p_h.messegetxt = t.Text;
+                            p_h.sizetxtbox_w = t.Size.Width;
+                            p_h.sizetxtbox_h = t.Size.Height;
+                            TextBox newtxt = new TextBox();
+                            newtxt.Multiline = true;
+                            newtxt.Text = undo_point[undo_point.Count - 1].messegetxt;
+                            newtxt.Size = new Size(undo_point[undo_point.Count - 1].sizetxtbox_w, undo_point[undo_point.Count - 1].sizetxtbox_h);
+                            newtxt.Location = new Point(2, 2);
+                            undo_point[undo_point.Count - 1].targetPoint.Controls.Clear();
+                            undo_point[undo_point.Count - 1].targetPoint.Controls.Add(newtxt);
+                            undo_point[undo_point.Count - 1].targetPoint.Size = new Size(newtxt.Size.Width + 4, newtxt.Size.Height + 4);
+                        }
+                    }
                     if (!redo_point.Contains(p_h))
                     {
                         redo_point.Add(p_h);   
                     }
+                    
                     undo_point[undo_point.Count - 1].targetPoint.Location = new Point(undo_point[undo_point.Count - 1].X, undo_point[undo_point.Count - 1].Y);
                     undo_point.RemoveAt(undo_point.Count - 1);
 
@@ -743,6 +1002,24 @@ namespace WindowsFormsApp1
 
                     p_h.X = p.Left;
                     p_h.Y = p.Top;
+                    p_h.targetPoint.Tag = p.Tag;
+                    if (redo_point[redo_point.Count - 1].targetPoint.Tag == "t")
+                    {
+                        foreach (TextBox t in redo_point[redo_point.Count - 1].targetPoint.Controls)
+                        {
+                            p_h.messegetxt = t.Text;
+                            p_h.sizetxtbox_w = t.Size.Width;
+                            p_h.sizetxtbox_h = t.Size.Height;
+                            TextBox newtxt = new TextBox();
+                            newtxt.Multiline = true;
+                            newtxt.Text = redo_point[redo_point.Count - 1].messegetxt;
+                            newtxt.Size = new Size(redo_point[redo_point.Count - 1].sizetxtbox_w, redo_point[redo_point.Count - 1].sizetxtbox_h);
+                            newtxt.Location = new Point(2, 2);
+                            redo_point[redo_point.Count - 1].targetPoint.Controls.Clear();
+                            redo_point[redo_point.Count - 1].targetPoint.Controls.Add(newtxt);
+                            redo_point[redo_point.Count - 1].targetPoint.Size = new Size(newtxt.Size.Width + 4, newtxt.Size.Height + 4);
+                        }
+                    }
                     if (!undo_point.Contains(p_h))
                     {
                         undo_point.Add(p_h);
@@ -760,8 +1037,9 @@ namespace WindowsFormsApp1
             public Control targetPoint;
             public int X;
             public int Y;
-            //public Color BgColor;
-            //public CommandKind command;
+            public string messegetxt = "";
+            public int sizetxtbox_w = 0;
+            public int sizetxtbox_h = 0; 
 
             public override string ToString()
             {

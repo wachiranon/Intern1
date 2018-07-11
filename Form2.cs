@@ -9,6 +9,10 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using Newtonsoft.Json.Serialization;
+using SharpConnect.WebServers;
+using SharpConnect;
+
+
 
 namespace WindowsFormsApp1
 {
@@ -18,6 +22,7 @@ namespace WindowsFormsApp1
         //int x, y;
         public Form2()
         {
+            
             InitializeComponent();
             //this.button1.MouseDown += Button1_MouseDown;
             //this.button1.MouseUp += Button1_MouseUp;
@@ -53,8 +58,18 @@ namespace WindowsFormsApp1
 
         private void Form2_Load(object sender, EventArgs e)
         {
-            //Area.MouseDown += Area.Selected;
-            
+            //AppHost testApp = new AppHost(); ;
+
+            ////Area.MouseDown += Area.Selected;
+            //WebServer webServer = new WebServer(8080, true, testApp.HandleRequest);
+            ////test websocket 
+            //var webSocketServer = new WebSocketServer();
+            //webSocketServer.SetOnNewConnectionContext(ctx =>
+            //{
+            //    ctx.SetMessageHandler(testApp.HandleWebSocket);
+            //});
+            //webServer.WebSocketServer = webSocketServer;
+            //webServer.Start();
         }
 
         private void panel1_Paint(object sender, PaintEventArgs e)
@@ -218,6 +233,22 @@ namespace WindowsFormsApp1
         private void label2_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            this.Area.Controls.Clear();
+            Area.load_form_server();
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            Area.AddTxtBox();
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            Area.ImportPictureBox();
         }
     }
 }

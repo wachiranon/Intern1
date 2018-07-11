@@ -13,3 +13,10 @@ F:\Work\com\ฝึกงาน\WindowsFormsApp1\WindowsFormsApp1\obj\Debug\Windo
 F:\Work\com\ฝึกงาน\WindowsFormsApp1\WindowsFormsApp1\bin\Debug\Newtonsoft.Json.dll
 F:\Work\com\ฝึกงาน\WindowsFormsApp1\WindowsFormsApp1\bin\Debug\Newtonsoft.Json.xml
 F:\Work\com\ฝึกงาน\WindowsFormsApp1\WindowsFormsApp1\obj\Debug\WindowsFormsApp1.csproj.CopyComplete
+F:\Work\com\ฝึกงาน\WindowsFormsApp1\WindowsFormsApp1\bin\Debug\SharpConnect.WebServer.dll
+F:\Work\com\ฝึกงาน\WindowsFormsApp1\WindowsFormsApp1\bin\Debug\Test2.exe
+F:\Work\com\ฝึกงาน\WindowsFormsApp1\WindowsFormsApp1\bin\Debug\WebServerApp.exe
+F:\Work\com\ฝึกงาน\WindowsFormsApp1\WindowsFormsApp1\bin\Debug\SharpConnect.WebServer.pdb
+F:\Work\com\ฝึกงาน\WindowsFormsApp1\WindowsFormsApp1\bin\Debug\Test2.pdb
+F:\Work\com\ฝึกงาน\WindowsFormsApp1\WindowsFormsApp1\bin\Debug\Test2.exe.config
+F:\Work\com\ฝึกงาน\WindowsFormsApp1\WindowsFormsApp1\bin\Debug\WebServerApp.pdb
