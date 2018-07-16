@@ -487,7 +487,8 @@ namespace WindowsFormsApp1
         public void load_form_server()
         {
             string result;
-            
+            string filepath;
+            Image im;
             var httpWebRequest = (HttpWebRequest)WebRequest.Create("http://localhost:8080/savejson.json");
             var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
             using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
@@ -520,6 +521,33 @@ namespace WindowsFormsApp1
                     area.MouseUp += Button1_MouseUp;
                     area.MouseMove += Button1_Move;
                     area.Tag = savePanel[i].T;
+                    if (savePanel[i].T == "t")
+                    {
+                        TextBox txt = new TextBox();
+                        txt.Multiline = true;
+                        txt.Size = new Size(savePanel[i].sizetxt_X, savePanel[i].sizetxt_y);
+                        txt.Text = savePanel[i].path;
+                        txt.Location = new Point(2, 2);
+                        area.Size = new Size(savePanel[i].sizetxt_X + 4, savePanel[i].sizetxt_y + 4);
+                        area.Controls.Add(txt);
+                    }
+                    else if (savePanel[i].T == "p")
+                    {
+                        PictureBox newptb = new PictureBox();
+                        newptb.SizeMode = PictureBoxSizeMode.StretchImage;
+                        newptb.Size = new Size(32, 32);
+                        filepath = savePanel[i].path;
+                        Byte[] b = Convert.FromBase64String(filepath);
+                        using (var ms = new MemoryStream(b, 0, b.Length))
+                        {
+                            im = Image.FromStream(ms, true);
+                            newptb.Image = im;
+                            newptb.Location = new Point(9, 10);
+                            area.Size = new Size(50, 50);
+                            area.Controls.Add(newptb);
+                        }
+                    }
+
                     PointHistory p_h = new PointHistory();
                     p_h.targetPoint = area;
                     p_h.X = savePanel[i].X;
@@ -532,7 +560,6 @@ namespace WindowsFormsApp1
                 //----Add Undo-----//
                 while (undoList.Count > 0)
                 {
-                    
                     foreach (Panel u1 in this.Controls)
                     {
                         if ((string)u1.Tag == undoList[0].T)
@@ -541,6 +568,12 @@ namespace WindowsFormsApp1
                             u_h.targetPoint = u1;
                             u_h.X = undoList[0].X;
                             u_h.Y = undoList[0].Y;
+                            if (undoList[0].T == "t")
+                            {
+                                u_h.sizetxtbox_w = undoList[0].sizetxt_X;
+                                u_h.sizetxtbox_h = undoList[0].sizetxt_y;
+                                u_h.messegetxt = undoList[0].path;
+                            }
                             undo_point.Add(u_h);
                             undoList.RemoveAt(0);
                             break;
@@ -552,9 +585,6 @@ namespace WindowsFormsApp1
                 multi_point = hisList;
             }
         }
-
-
-       
 
         public string filePhotoPath;
         public void ImportPictureBox()
@@ -588,18 +618,6 @@ namespace WindowsFormsApp1
 
 
 
-        public class TargetUndo
-        {
-            public int X;
-            public int Y;
-            public int T;
-        }
-
-        public class SelectUndo
-        {
-            public int Select;
-        }
-
         class point_json
         {
             public int X;
@@ -608,29 +626,17 @@ namespace WindowsFormsApp1
             public string path;
             public int sizetxt_X;
             public int sizetxt_y;
-            public string messeage;
         }
 
 
         public void Save_point()
         {
             
-            using (Image image = Image.FromFile(filePhotoPath))
-            {
-                using (MemoryStream m = new MemoryStream())
-                {
-                    image.Save(m, image.RawFormat);
-                    byte[] imageBytes = m.ToArray();
-
-                    base64String = Convert.ToBase64String(imageBytes);
-                }
-            }
+            
             List<point_json> p_d = new List<point_json>();
             foreach (Control p in this.Controls)
             {
                 point_json js = new point_json();
-                //            w.Write(p.Left);
-                //            w.Write(p.Top);
                 js.T = (string)p.Tag;
                 js.X = p.Left;
                 js.Y = p.Top;
@@ -640,13 +646,24 @@ namespace WindowsFormsApp1
                     {
                         js.sizetxt_X = t.Size.Width;
                         js.sizetxt_y = t.Size.Height;
-                        js.messeage = t.Text;
+                        js.path = t.Text;
                     }
                 }
                 else if((string)p.Tag == "p")
                 {
-                    foreach(PictureBox pb in p.Controls)
+                    
+                    foreach (PictureBox pb in p.Controls)
                     {
+                        using (Image image = Image.FromFile(filePhotoPath))
+                        {
+                            using (MemoryStream m = new MemoryStream())
+                            {
+                                image.Save(m, image.RawFormat);
+                                byte[] imageBytes = m.ToArray();
+
+                                base64String = Convert.ToBase64String(imageBytes);
+                            }
+                        }
                         js.path = base64String;
                     }
                 }
@@ -683,7 +700,7 @@ namespace WindowsFormsApp1
                     {
                         new_u.sizetxt_X = undo_point[i].sizetxtbox_w;
                         new_u.sizetxt_y = undo_point[i].sizetxtbox_h;
-                        new_u.messeage = undo_point[i].messegetxt;
+                        new_u.path = undo_point[i].messegetxt;
                     }
                     else if((string)undo_point[i].targetPoint.Tag == "p")
                     {
@@ -714,7 +731,6 @@ namespace WindowsFormsApp1
             ///-----------save to other computer
         }
 
-
         public void Load_point()
         {
             this.Controls.Clear();
@@ -730,7 +746,6 @@ namespace WindowsFormsApp1
                     p = JsonConvert.DeserializeObject<List<point_json>>(r_j);
                     f_p.Close();
                 }
-
             }
             for (int i = 0; i < p.Count; i++)
             {
@@ -747,7 +762,7 @@ namespace WindowsFormsApp1
                     TextBox txt = new TextBox();
                     txt.Multiline = true;
                     txt.Size = new Size(p[i].sizetxt_X, p[i].sizetxt_y);
-                    txt.Text = p[i].messeage;
+                    txt.Text = p[i].path;
                     txt.Location = new Point(2, 2);
                     area.Size = new Size(p[i].sizetxt_X+4, p[i].sizetxt_y+4);
                     area.Controls.Add(txt);
@@ -765,6 +780,7 @@ namespace WindowsFormsApp1
                         newptb.Location = new Point(9, 10);
                         area.Size = new Size(50, 50);
                         area.Controls.Add(newptb);
+                        
                     }
                 }
                 PointHistory p_h = new PointHistory();
@@ -805,7 +821,7 @@ namespace WindowsFormsApp1
                         {
                             u_h.sizetxtbox_w = u[0].sizetxt_X;
                             u_h.sizetxtbox_h = u[0].sizetxt_y;
-                            u_h.messegetxt = u[0].messeage;
+                            u_h.messegetxt = u[0].path;
                         }
                         undo_point.Add(u_h);
                         u.RemoveAt(0);
@@ -958,7 +974,7 @@ namespace WindowsFormsApp1
                     p_h.X = p.Left;
                     p_h.Y = p.Top;
                     p_h.targetPoint.Tag = p.Tag;
-                    if (undo_point[undo_point.Count - 1].targetPoint.Tag == "t")
+                    if ((string)undo_point[undo_point.Count - 1].targetPoint.Tag == "t")
                     {
                         foreach (TextBox t in undo_point[undo_point.Count - 1].targetPoint.Controls)
                         {
@@ -1003,7 +1019,7 @@ namespace WindowsFormsApp1
                     p_h.X = p.Left;
                     p_h.Y = p.Top;
                     p_h.targetPoint.Tag = p.Tag;
-                    if (redo_point[redo_point.Count - 1].targetPoint.Tag == "t")
+                    if ((string)redo_point[redo_point.Count - 1].targetPoint.Tag == "t")
                     {
                         foreach (TextBox t in redo_point[redo_point.Count - 1].targetPoint.Controls)
                         {
@@ -1040,7 +1056,6 @@ namespace WindowsFormsApp1
             public string messegetxt = "";
             public int sizetxtbox_w = 0;
             public int sizetxtbox_h = 0; 
-
             public override string ToString()
             {
                 if(targetPoint.Tag != null)
@@ -1090,6 +1105,5 @@ namespace WindowsFormsApp1
             }
             return st.ToString();
         }
-
     }
 }
